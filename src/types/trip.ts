@@ -2,7 +2,7 @@ export type Currency = 'USD' | 'KHR'
 
 export type MemberRole = 'leader' | 'member'
 
-export type TransportationType = 'motorcycle' | 'van'
+export type TransportationType = 'motorcycle' | 'van' | 'bus'
 
 export type AccommodationType = 'hotel' | 'guesthouse' | 'camping'
 

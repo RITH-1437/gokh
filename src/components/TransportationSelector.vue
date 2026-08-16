@@ -1,41 +1,52 @@
 <template>
   <div class="space-y-5">
-    <div class="flex gap-3">
+    <div class="grid grid-cols-3 gap-3.5">
       <button
         v-for="option in options"
         :key="option.value"
         type="button"
         @click="selectTransportation(option.value)"
         :class="[
-          'group flex-1 rounded-2xl border-2 p-4 sm:p-5 flex flex-col items-center gap-2.5 transition-all duration-200 focus-ring active:scale-[.98]',
+          'group relative overflow-hidden rounded-3xl border-2 bg-white text-left transition-all duration-300 will-change-transform focus-ring active:scale-[.97]',
           modelValue.type === option.value
-            ? 'border-cambodia-500 bg-cambodia-50/70 shadow-glow'
-            : 'border-stone-200/80 bg-white hover:border-cambodia-300 hover:-translate-y-0.5 hover:shadow-soft'
+            ? 'border-cambodia-500 shadow-glow ring-4 ring-cambodia-500/15'
+            : 'border-stone-200/80 hover:border-cambodia-300 hover:-translate-y-1 hover:shadow-lift'
         ]"
       >
-        <div class="relative">
-          <Emoji3D
-            :emoji="option.emoji"
-            size="xl"
-            shape="tile"
-            :tone="modelValue.type === option.value ? 'green' : 'ivory'"
-            :float="modelValue.type === option.value"
-            :float-delay="700"
+        <div class="relative h-20 sm:h-24 w-full overflow-hidden">
+          <img
+            :src="option.image"
+            :alt="option.label"
+            loading="lazy"
+            class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+          <span class="absolute top-2 left-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[14px] shadow-soft">
+            {{ option.emoji }}
+          </span>
+
           <span
             v-if="modelValue.type === option.value"
-            class="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-cambodia-600 text-white flex items-center justify-center shadow-glow animate-check-pop"
+            class="absolute top-2 right-2 w-7 h-7 rounded-full bg-cambodia-600 text-white flex items-center justify-center shadow-glow animate-check-pop"
           >
-            <Icon name="check" :size="13" />
+            <Icon name="check" :size="14" />
           </span>
+
+          <div class="absolute inset-x-0 bottom-0 p-2.5">
+            <div class="font-bold text-white text-[13px] leading-tight drop-shadow-sm">{{ option.label }}</div>
+          </div>
         </div>
-        <span class="font-bold text-ink text-[15px]">{{ option.label }}</span>
-        <span
-          v-if="modelValue.type === option.value"
-          class="text-[12px] font-semibold text-cambodia-700 animate-pop-in"
+
+        <div
+          :class="[
+            'h-8 flex items-center justify-center text-[11px] font-bold tracking-wide transition-colors duration-200',
+            modelValue.type === option.value ? 'bg-cambodia-600 text-white' : 'bg-ivory text-ink-mute group-hover:text-cambodia-700'
+          ]"
         >
-          Selected
-        </span>
+          <Icon v-if="modelValue.type === option.value" name="check" :size="12" class="mr-1" />
+          {{ modelValue.type === option.value ? 'Selected' : 'Choose' }}
+        </div>
       </button>
     </div>
 
@@ -56,8 +67,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { Transportation, TransportationType } from '../types/trip'
-import Emoji3D from './Emoji3D.vue'
 import Icon from './icons/Icon.vue'
+
+import motorImg from '../assets/images/vehicle/motor-honda.png'
+import vanImg from '../assets/images/vehicle/van.png'
+import busImg from '../assets/images/vehicle/bus.png'
 
 const props = defineProps<{
   modelValue: Transportation
@@ -68,8 +82,9 @@ const emit = defineEmits<{
 }>()
 
 const options = [
-  { value: 'motorcycle' as TransportationType, label: 'Motorcycle', emoji: '🛵' },
-  { value: 'van' as TransportationType, label: 'Van', emoji: '🚐' }
+  { value: 'motorcycle' as TransportationType, label: 'Motorcycle', emoji: '🛵', image: motorImg },
+  { value: 'van' as TransportationType, label: 'Van', emoji: '🚐', image: vanImg },
+  { value: 'bus' as TransportationType, label: 'Bus', emoji: '🚌', image: busImg }
 ]
 
 const note = ref(props.modelValue.note || '')

@@ -1,12 +1,13 @@
 import type { Destination } from '../types/trip'
 
-import phnomPenhImg from '../assets/images/phnom-penh.png'
-import angkorWatImg from '../assets/images/angkor-wat.png'
-import kampotImg from '../assets/images/kompot.png'
-import kepImg from '../assets/images/kep.png'
-import kohRongImg from '../assets/images/koh-rong.png'
-import battambangImg from '../assets/images/battambong.png'
-import bokorImg from '../assets/images/bokor-mountain.png'
+import phnomPenhImg from '../assets/images/place/phnom-penh.png'
+import siemReapImg from '../assets/images/place/siem-reab.png'
+import angkorWatImg from '../assets/images/place/angkor-wat.png'
+import kampotImg from '../assets/images/place/kompot.png'
+import kepImg from '../assets/images/place/kep.png'
+import kohRongImg from '../assets/images/place/koh-rong.png'
+import battambangImg from '../assets/images/place/battambong.png'
+import bokorImg from '../assets/images/place/bokor-mountain.png'
 
 export const CAMBODIAN_DESTINATIONS: Destination[] = [
   {
@@ -22,7 +23,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Northwest',
     emoji: '🛕',
     tagline: 'Home of Angkor Wat',
-    image: angkorWatImg,
+    image: siemReapImg,
     coordinates: { lat: 13.3618, lon: 103.8602 }
   },
   {

@@ -5,27 +5,27 @@
       <p class="text-[13px] font-semibold text-ink-soft mb-2.5">Popular in Cambodia</p>
 
       <!-- Mobile: horizontal snap scroll · Desktop: grid -->
-      <div class="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:overflow-visible lg:gap-3">
+      <div class="flex gap-3.5 overflow-x-auto no-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:overflow-visible lg:gap-3.5">
         <button
           v-for="dest in popularDestinations"
           :key="dest.name"
           type="button"
           @click="selectDestination(dest.name)"
           :class="[
-            'group relative snap-start shrink-0 w-[200px] lg:w-auto overflow-hidden rounded-2xl border-2 bg-white text-left transition-all duration-200 focus-ring active:scale-[.98]',
+            'group relative snap-start shrink-0 w-[210px] lg:w-auto overflow-hidden rounded-3xl border-2 bg-white text-left transition-all duration-300 will-change-transform focus-ring active:scale-[.97]',
             modelValue === dest.name
-              ? 'border-cambodia-500 shadow-glow'
-              : 'border-stone-200/80 hover:border-cambodia-300 hover:-translate-y-0.5 hover:shadow-soft'
+              ? 'border-cambodia-500 shadow-glow ring-4 ring-cambodia-500/15'
+              : 'border-stone-200/80 hover:border-cambodia-300 hover:-translate-y-1 hover:shadow-lift'
           ]"
         >
           <!-- Photo cover -->
-          <div class="relative h-24 sm:h-28 w-full">
+          <div class="relative h-28 sm:h-36 w-full overflow-hidden">
             <img
               v-if="dest.image"
               :src="dest.image"
               :alt="dest.name"
               loading="lazy"
-              class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+              class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
             <div v-else class="h-full w-full bg-cambodia-50 flex items-center justify-center">
               <Emoji3D
@@ -35,32 +35,36 @@
                 :tone="modelValue === dest.name ? 'green' : 'ivory'"
               />
             </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
 
-            <span class="absolute top-2 left-2 inline-flex items-center rounded-full bg-white/90 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-soft">
+            <span class="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-soft shadow-soft">
+              <span class="text-[12px] leading-none">{{ dest.emoji }}</span>
               {{ dest.region }}
             </span>
 
             <span
               v-if="modelValue === dest.name"
-              class="absolute top-2 right-2 w-6 h-6 rounded-full bg-cambodia-600 text-white flex items-center justify-center shadow-glow animate-check-pop"
+              class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-cambodia-600 text-white flex items-center justify-center shadow-glow animate-check-pop"
             >
-              <Icon name="check" :size="13" />
+              <Icon name="check" :size="14" />
             </span>
-          </div>
 
-          <!-- Card body -->
-          <div class="px-3.5 py-3">
-            <div class="font-bold text-[15px] text-ink leading-tight">{{ dest.name }}</div>
-            <div class="text-[12.5px] text-ink-mute leading-snug mt-0.5">
-              {{ dest.tagline || dest.region }}
+            <div class="absolute inset-x-0 bottom-0 p-3">
+              <div class="font-extrabold text-white text-[15px] sm:text-base leading-tight drop-shadow-sm">{{ dest.name }}</div>
+              <div class="text-[12px] text-white/85 leading-snug mt-0.5">{{ dest.tagline || dest.region }}</div>
             </div>
           </div>
 
+          <!-- Footer -->
           <div
-            v-if="modelValue === dest.name"
-            class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cambodia-500 to-cambodia-600"
-          />
+            :class="[
+              'h-8 flex items-center justify-center text-[11px] font-bold tracking-wide transition-colors duration-200',
+              modelValue === dest.name ? 'bg-cambodia-600 text-white' : 'bg-ivory text-ink-mute group-hover:text-cambodia-700'
+            ]"
+          >
+            <Icon v-if="modelValue === dest.name" name="check" :size="12" class="mr-1" />
+            {{ modelValue === dest.name ? 'Selected' : 'Choose' }}
+          </div>
         </button>
       </div>
     </div>

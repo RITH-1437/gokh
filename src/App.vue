@@ -281,7 +281,7 @@ const mobileSummary = computed(() => {
                 id="step-how"
                 :step="4"
                 title="How are you getting around?"
-                subtitle="Motorcycle vibes or van squad?"
+                subtitle="Motorcycle, van, or bus — pick your ride."
                 :done="!!trip.transportation.type"
               >
                 <TransportationSelector v-model="trip.transportation" />

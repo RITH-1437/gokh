@@ -171,7 +171,8 @@ const destImage = computed(() => findDestination(props.trip.destination)?.image)
 const transport = computed(() => {
   const map: Record<string, { label: string; emoji: string }> = {
     motorcycle: { label: 'Motorcycle', emoji: '🛵' },
-    van: { label: 'Van', emoji: '🚐' }
+    van: { label: 'Van', emoji: '🚐' },
+    bus: { label: 'Bus', emoji: '🚌' }
   }
   return map[props.trip.transportation.type] || { label: '', emoji: '' }
 })
