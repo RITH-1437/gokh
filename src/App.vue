@@ -22,6 +22,7 @@ import { useTrip } from './composables/useTrip'
 import { useWeather } from './composables/useWeather'
 import { useTripShare } from './composables/useTripShare'
 import { useToasts } from './composables/useToasts'
+import { findDestination } from './data/destinations'
 import type { Activity } from './types/trip'
 import { formatTripRange } from './utils/dates'
 import { formatCurrency } from './utils/currency'
@@ -114,8 +115,12 @@ const handleRemoveActivity = (dayIndex: number, actIndex: number) => {
 }
 
 const getDirections = (location: string) => {
-  const query = encodeURIComponent(`${location}, Cambodia`)
-  window.open(`https://www.openstreetmap.org/search?query=${query}`, '_blank')
+  if (!location) return
+  const dest = findDestination(location)
+  const target = dest?.coordinates
+    ? `${dest.coordinates.lat},${dest.coordinates.lon}`
+    : encodeURIComponent(`${location}, Cambodia`)
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${target}`, '_blank', 'noopener')
 }
 
 // Share (header + mobile bar)

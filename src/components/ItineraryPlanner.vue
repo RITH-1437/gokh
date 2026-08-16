@@ -23,7 +23,7 @@
 
     <!-- Timeline -->
     <div v-else class="relative">
-      <div class="absolute left-[27px] sm:left-[31px] top-3 bottom-3 w-[2px] bg-stone-200 rounded-full" />
+      <div class="absolute left-[27px] sm:left-[31px] top-4 bottom-4 w-[2px] rounded-full bg-gradient-to-b from-cambodia-300/70 via-stone-200 to-stone-200" />
 
       <div v-for="(day, dayIndex) in itinerary" :key="day.dayNumber" class="relative pb-9">
         <!-- Day node -->
@@ -31,8 +31,10 @@
           <div class="relative z-10 flex-none">
             <div
               :class="[
-                'w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] rounded-2xl flex flex-col items-center justify-center shadow-glow border',
-                hasActivities(day) ? 'bg-cambodia-600 border-cambodia-700 text-white' : 'bg-white border-stone-200 text-ink'
+                'w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] rounded-2xl flex flex-col items-center justify-center shadow-glow border transition-colors duration-300',
+                hasActivities(day)
+                  ? 'bg-gradient-to-b from-cambodia-500 to-cambodia-700 border-cambodia-700 text-white ring-4 ring-cambodia-500/10'
+                  : 'bg-white border-stone-200 text-ink'
               ]"
             >
               <span class="text-[9px] sm:text-[10px] font-bold tracking-[0.16em]">DAY {{ String(day.dayNumber).padStart(2, '0') }}</span>
@@ -51,6 +53,11 @@
           </div>
 
           <div class="ml-auto flex items-center gap-2">
+            <!-- Stop count chip -->
+            <span v-if="day.activities.length" class="chip !pointer-events-none !bg-white hidden sm:inline-flex">
+              <Icon name="flag" :size="12" class="text-sand-600" />
+              {{ day.activities.length }} stop{{ day.activities.length > 1 ? 's' : '' }}
+            </span>
             <!-- Weather chip for this day -->
             <div v-if="weatherLoading" class="skeleton w-20 h-8" />
             <div
@@ -69,15 +76,36 @@
           <div
             v-for="(activity, actIndex) in day.activities"
             :key="activity.id"
-            class="surface !rounded-2xl p-4 transition-all duration-200 animate-slide-down"
+            class="relative overflow-hidden surface !rounded-2xl border border-stone-200/60 p-4 transition-all duration-200 hover:shadow-lift animate-slide-down"
           >
+            <div
+              v-if="activity.startTime"
+              class="absolute left-0 top-3 bottom-3 w-1 rounded-r-full bg-gradient-to-b from-cambodia-500 to-cambodia-700"
+            />
             <!-- Read mode -->
             <div v-if="!isEditing(dayIndex, actIndex)" class="flex items-start gap-3">
-              <Emoji3D emoji="📍" size="sm" shape="tile" :tone="hasActivities(day) ? 'green' : 'ivory'" />
+              <div class="flex-none pt-0.5">
+                <div
+                  :class="[
+                    'w-8 h-8 rounded-xl flex items-center justify-center text-[13px] font-extrabold tnum',
+                    hasActivities(day) ? 'bg-cambodia-600 text-white shadow-soft' : 'bg-stone-100 text-ink-mute'
+                  ]"
+                >
+                  {{ actIndex + 1 }}
+                </div>
+              </div>
               <div class="flex-1 min-w-0">
-                <div class="font-bold text-ink text-[15px] leading-snug">{{ activity.name }}</div>
-                <div v-if="activity.startTime || activity.endTime" class="text-[13px] text-ink-mute tnum mt-0.5">
-                  {{ activity.startTime || '--:--' }} — {{ activity.endTime || '--:--' }}
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <div class="font-bold text-ink text-[15px] leading-snug">{{ activity.name }}</div>
+                  <span v-if="activity.startTime && activity.endTime" class="chip !bg-ivory tnum text-[11.5px]">
+                    <Icon name="clock" :size="12" class="text-cambodia-700" />
+                    {{ activity.startTime }}–{{ activity.endTime }}
+                    <span class="text-ink-mute">· {{ timeDuration(activity.startTime, activity.endTime) }}</span>
+                  </span>
+                  <span v-else-if="activity.startTime" class="chip !bg-ivory tnum text-[11.5px]">
+                    <Icon name="clock" :size="12" class="text-cambodia-700" />
+                    {{ activity.startTime }}
+                  </span>
                 </div>
                 <p v-if="activity.description" class="text-[13.5px] text-ink-soft mt-1.5 leading-relaxed">
                   {{ activity.description }}
@@ -262,6 +290,18 @@ const dayName = (date: string) => parseISODate(date).toLocaleDateString('en-US',
 
 const dayWeather = (date: string): WeatherDay | undefined =>
   props.weather.find(w => w.date === date)
+
+const timeDuration = (start: string, end: string): string => {
+  const [sh, sm] = start.split(':').map(Number)
+  const [eh, em] = end.split(':').map(Number)
+  let mins = (eh * 60 + em) - (sh * 60 + sm)
+  if (mins < 0) mins += 24 * 60
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  if (h === 0) return `${m}m`
+  if (m === 0) return `${h}h`
+  return `${h}h ${m}m`
+}
 
 const weatherEmoji = (code: number): string => {
   if (code === 0) return '☀️'

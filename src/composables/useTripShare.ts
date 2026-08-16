@@ -8,6 +8,11 @@ export const useTripShare = () => {
   const isSharing = ref(false)
   const error = ref<string | null>(null)
 
+  const isMobileDevice = (): boolean => {
+    if (typeof navigator === 'undefined') return false
+    return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+  }
+
   const generateShareUrl = (trip: Trip): string => {
     try {
       const url = generateTripUrl(trip)
@@ -54,25 +59,24 @@ export const useTripShare = () => {
 
     try {
       const url = generateShareUrl(trip)
-      
+
       // Update browser URL
       updateBrowserUrl(trip)
-      
-      // Try native share API on mobile
-      if (navigator.share) {
-        try {
-          await navigator.share({
+
+      // Native share sheet on mobile only — on desktop it opens a small
+      // share dialog that can hang the UI, so just copy to clipboard there.
+      if (navigator.share && isMobileDevice()) {
+        const shared = await Promise.race([
+          navigator.share({
             title: trip.tripName || 'Cambodia Trip',
             text: `Join my Cambodia trip: ${trip.tripName}`,
             url: url
-          })
-          return true
-        } catch (shareErr) {
-          // If native share fails (user cancelled or not supported), fall back to clipboard
-          console.log('Native share cancelled or failed, falling back to clipboard')
-        }
+          }).then(() => true).catch(() => false),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 4000))
+        ])
+        if (shared) return true
       }
-      
+
       // Fallback to clipboard
       return await copyToClipboard(url)
     } catch (err) {

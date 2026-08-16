@@ -50,6 +50,18 @@
       </div>
     </div>
 
+    <!-- Days until the trip starts -->
+    <div v-if="daysUntilStart !== null" class="mt-3 flex items-center justify-center animate-slide-down">
+      <div class="inline-flex items-center gap-2 rounded-full bg-sand-100 border border-sand-200 text-sand-800 px-4 py-1.5 shadow-soft">
+        <span class="text-sm">{{ daysUntilStart === 0 ? '🎉' : '⏳' }}</span>
+        <span class="text-[13px] font-bold tnum">
+          <template v-if="daysUntilStart === 0">Your trip starts today!</template>
+          <template v-else-if="daysUntilStart === 1">1 day to go — starts tomorrow</template>
+          <template v-else>{{ daysUntilStart }} days to go until the start</template>
+        </span>
+      </div>
+    </div>
+
     <!-- Hidden native date inputs -->
     <input
       ref="startInput"
@@ -92,7 +104,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { formatDateTile, calculateDuration, isValidDateRange, todayISO } from '../utils/dates'
+import { formatDateTile, calculateDuration, isValidDateRange, todayISO, parseISODate } from '../utils/dates'
 import { validateDateRange } from '../utils/validation'
 import WarningAlert from './WarningAlert.vue'
 import Icon from './icons/Icon.vue'
@@ -123,6 +135,16 @@ const duration = computed(() => {
   if (!startDate.value || !endDate.value) return null
   if (!isValidDateRange(startDate.value, endDate.value)) return null
   return calculateDuration(startDate.value, endDate.value)
+})
+
+const daysUntilStart = computed(() => {
+  if (!startDate.value) return null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const start = parseISODate(startDate.value)
+  start.setHours(0, 0, 0, 0)
+  const diff = Math.round((start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  return diff < 0 ? null : diff
 })
 
 const pick = (which: 'start' | 'end') => {
