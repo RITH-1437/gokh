@@ -15,6 +15,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Capital',
     emoji: '🏙️',
     tagline: 'The bustling capital',
+    suggestedName: 'Phnom Penh City Trip',
     image: phnomPenhImg,
     coordinates: { lat: 11.5564, lon: 104.9282 }
   },
@@ -23,6 +24,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Northwest',
     emoji: '🛕',
     tagline: 'Home of Angkor Wat',
+    suggestedName: 'Angkor Wat Trip',
     image: siemReapImg,
     coordinates: { lat: 13.3618, lon: 103.8602 }
   },
@@ -31,6 +33,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Siem Reap',
     emoji: '🏛️',
     tagline: 'Temples of wonders',
+    suggestedName: 'Temple Explorer Trip',
     image: angkorWatImg,
     coordinates: { lat: 13.4125, lon: 103.8670 }
   },
@@ -39,6 +42,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'South',
     emoji: '🌊',
     tagline: 'Riverside charm',
+    suggestedName: 'Kampot Riverside Trip',
     image: kampotImg,
     coordinates: { lat: 10.6104, lon: 104.1785 }
   },
@@ -47,6 +51,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'South',
     emoji: '🦀',
     tagline: 'Seaside crab town',
+    suggestedName: 'Kep Crab & Beach Trip',
     image: kepImg,
     coordinates: { lat: 10.4347, lon: 104.2947 }
   },
@@ -55,6 +60,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Islands',
     emoji: '🏖️',
     tagline: 'Island escape',
+    suggestedName: 'Koh Rong Island Escape',
     image: kohRongImg,
     coordinates: { lat: 10.7819, lon: 103.2078 }
   },
@@ -63,6 +69,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Islands',
     emoji: '🏝️',
     tagline: 'Quiet island bliss',
+    suggestedName: 'Sanloem Island Escape',
     image: kohRongImg,
     coordinates: { lat: 10.6725, lon: 103.2683 }
   },
@@ -71,6 +78,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'South',
     emoji: '🌴',
     tagline: 'Beach city',
+    suggestedName: 'Sihanoukville Beach Trip',
     coordinates: { lat: 10.6354, lon: 103.5228 }
   },
   {
@@ -78,6 +86,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Northwest',
     emoji: '🚂',
     tagline: 'Bamboo train country',
+    suggestedName: 'Bamboo Train Adventure',
     image: battambangImg,
     coordinates: { lat: 13.0957, lon: 103.2018 }
   },
@@ -86,6 +95,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Northeast',
     emoji: '⛰️',
     tagline: 'Green highlands',
+    suggestedName: 'Mondulkiri Highlands Trip',
     coordinates: { lat: 12.4447, lon: 107.2028 }
   },
   {
@@ -93,6 +103,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Northeast',
     emoji: '🌋',
     tagline: 'Volcanic lakes & jungle',
+    suggestedName: 'Ratanakiri Jungle Adventure',
     coordinates: { lat: 13.7392, lon: 106.9875 }
   },
   {
@@ -100,6 +111,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'West',
     emoji: '🌳',
     tagline: 'Cardamom wilds',
+    suggestedName: 'Cardamom Jungle Adventure',
     coordinates: { lat: 11.5708, lon: 102.9842 }
   },
   {
@@ -107,6 +119,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Kampot',
     emoji: '🏰',
     tagline: 'Misty hill station',
+    suggestedName: 'Bokor Hill Station Trip',
     image: bokorImg,
     coordinates: { lat: 10.6983, lon: 104.0083 }
   },
@@ -115,6 +128,7 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     region: 'Siem Reap',
     emoji: '💦',
     tagline: 'Waterfalls & lingas',
+    suggestedName: 'Kulen Waterfall Adventure',
     coordinates: { lat: 13.6917, lon: 104.0389 }
   }
 ]

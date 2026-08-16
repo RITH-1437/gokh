@@ -55,6 +55,29 @@ const toasts = useToasts()
 
 const isSharing = ref(false)
 
+// Auto-name the trip from the destination until the user edits it manually
+const nameAutoSet = ref(false)
+const updateTripName = (name: string) => {
+  trip.value.tripName = name
+  nameAutoSet.value = false
+}
+
+watch(
+  () => trip.value.destination,
+  (destination) => {
+    if (!destination) {
+      nameAutoSet.value = false
+      return
+    }
+    const dest = findDestination(destination)
+    if (!dest?.suggestedName) return
+    if (!trip.value.tripName.trim() || nameAutoSet.value) {
+      trip.value.tripName = dest.suggestedName
+      nameAutoSet.value = true
+    }
+  }
+)
+
 // Load trip from URL on mount
 onMounted(() => {
   loadTripFromUrl()
@@ -366,7 +389,7 @@ const mobileSummary = computed(() => {
           <!-- Right: sticky preview (desktop) -->
           <div id="preview" class="hidden lg:block">
             <div class="lg:sticky lg:top-24 space-y-5">
-              <TripPreview :trip="trip" :per-person-budget="perPersonBudget" @update:trip-name="trip.tripName = $event" />
+              <TripPreview :trip="trip" :per-person-budget="perPersonBudget" @update:trip-name="updateTripName" />
 
               <!-- Directions -->
               <div v-if="trip.destination" class="surface !rounded-2xl p-4 flex items-center gap-3">
@@ -389,7 +412,7 @@ const mobileSummary = computed(() => {
 
         <!-- Mobile: preview + share -->
         <div class="lg:hidden mt-10 space-y-5" id="preview-mobile">
-          <TripPreview :trip="trip" :per-person-budget="perPersonBudget" @update:trip-name="trip.tripName = $event" />
+          <TripPreview :trip="trip" :per-person-budget="perPersonBudget" @update:trip-name="updateTripName" />
 
           <div v-if="trip.destination" class="surface !rounded-2xl p-4 flex items-center gap-3">
             <Emoji3D emoji="🧭" size="sm" shape="tile" />

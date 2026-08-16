@@ -73,6 +73,7 @@ export interface Destination {
   region: string
   emoji?: string
   tagline?: string
+  suggestedName?: string
   image?: string
   coordinates?: {
     lat: number
