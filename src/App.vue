@@ -105,8 +105,28 @@ const steps = computed(() => [
   { key: 'plan', label: 'Plan', done: trip.value.itinerary.some(d => d.activities.length > 0) }
 ])
 
+const SECTION_IDS: Record<string, string> = {
+  where: 'step-where',
+  who: 'step-who',
+  when: 'step-when',
+  how: 'step-how',
+  stay: 'step-stay',
+  budget: 'step-budget',
+  plan: 'step-plan'
+}
+
+const currentKey = computed(() => steps.value.find(s => !s.done)?.key || 'plan')
+
 const scrollTo = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+const navigateToStep = (key: string) => scrollTo(SECTION_IDS[key])
+
+// Jump to the first incomplete step (used by share / itinerary empty states)
+const completeTrip = () => {
+  const next = steps.value.find(s => !s.done)
+  scrollTo(next ? SECTION_IDS[next.key] : 'step-plan')
 }
 
 const scrollToPreview = () => {
@@ -248,7 +268,7 @@ const mobileSummary = computed(() => {
       <!-- Progress -->
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         <Reveal>
-          <TripProgress :steps="steps" />
+          <TripProgress :steps="steps" :current-key="currentKey" @navigate="navigateToStep" />
         </Reveal>
       </div>
 
@@ -373,6 +393,7 @@ const mobileSummary = computed(() => {
                   @update-activity="handleUpdateActivity"
                   @remove-activity="handleRemoveActivity"
                   @directions="getDirections"
+                  @choose-dates="scrollTo('step-when')"
                 />
               </SectionShell>
             </Reveal>
@@ -405,7 +426,7 @@ const mobileSummary = computed(() => {
               </div>
 
               <!-- Share (desktop) -->
-              <ShareTrip :trip="trip" />
+              <ShareTrip :trip="trip" @complete-trip="completeTrip" />
             </div>
           </div>
         </div>
@@ -427,13 +448,13 @@ const mobileSummary = computed(() => {
           </div>
 
           <div id="share-section">
-            <ShareTrip :trip="trip" />
+            <ShareTrip :trip="trip" @complete-trip="completeTrip" />
           </div>
         </div>
       </div>
 
       <!-- Footer -->
-      <footer class="mt-6 pb-10">
+      <footer class="mt-6 pb-24 lg:pb-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-stone-200/70 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div class="flex items-center gap-2 text-ink-soft text-sm">
             <span class="text-base">🇰🇭</span>
@@ -450,11 +471,11 @@ const mobileSummary = computed(() => {
       v-if="showStickyShare"
       class="fixed bottom-0 inset-x-0 z-40 lg:hidden animate-slide-up"
     >
-      <div class="bg-ivory/90 backdrop-blur-md border-t border-stone-200/70 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lift">
+      <div class="bg-ivory/90 backdrop-blur-md border-t border-stone-200/70 px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lift">
         <div class="flex items-center gap-3 max-w-7xl mx-auto">
           <div class="flex-1 min-w-0">
             <div class="text-[13.5px] font-bold text-ink truncate">
-              {{ trip.destination || 'Plan your trip' }}
+              {{ trip.tripName || trip.destination || 'Plan your trip' }}
             </div>
             <div v-if="mobileSummary" class="text-[11.5px] text-ink-mute truncate tnum">
               {{ mobileSummary }}

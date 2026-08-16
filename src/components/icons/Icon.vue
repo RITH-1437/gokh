@@ -244,7 +244,7 @@ const icons: Record<string, { viewBox: string; path: string }> = {
   // Special
   'flag': {
     viewBox: '0 0 24 24',
-    path: '<path d="M4 15s1-1 4-1 5 2 5 2-4-1-9-1-9-1-1-9-1-1 0-4-1-4-1"/>'
+    path: '<path d="M4 2v20"/><path d="M4 3h14l-3.5 4 3.5 4H4z"/>'
   },
   'globe': {
     viewBox: '0 0 24 24',

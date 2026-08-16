@@ -6,30 +6,30 @@
       <Emoji3D emoji="🔗" size="lg" float :float-delay="400" />
 
       <h3 class="mt-4 text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
-        Ready to share?
+        {{ heading }}
       </h3>
       <p class="mt-1.5 text-[14px] text-ink-mute leading-relaxed max-w-xs">
-        Your adventure is ready. Send it to your crew with one link.
+        {{ description }}
       </p>
 
       <button
         class="btn-gold w-full sm:w-auto sm:min-w-[260px] mt-5 !h-12"
-        :disabled="isSharing || !canShare"
-        @click="handleShare"
+        :disabled="isSharing"
+        @click="handlePrimary"
       >
         <Icon v-if="isSharing" name="loader" :size="18" class="animate-spin" />
-        <Icon v-else-if="isCopied" name="check" :size="18" />
+        <Icon v-else-if="isReady && isCopied" name="check" :size="18" />
         <Icon v-else name="link" :size="18" />
         <span>{{ buttonText }}</span>
       </button>
 
-      <div v-if="isCopied" class="mt-3 flex items-center gap-1.5 text-[13px] font-semibold text-cambodia-700 animate-pop-in">
+      <div v-if="isReady && isCopied" class="mt-3 flex items-center gap-1.5 text-[13px] font-semibold text-cambodia-700 animate-pop-in">
         <Icon name="check-circle" :size="15" />
         Trip link copied — send it to your friends
       </div>
 
       <!-- Share link (manual copy) -->
-      <div v-if="shareUrl && !isCopied" class="mt-4 w-full max-w-sm">
+      <div v-if="shareUrl && isReady && !isCopied" class="mt-4 w-full max-w-sm">
         <div class="flex gap-2">
           <input
             :value="shareUrl"
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import type { Trip } from '../types/trip'
 import { useTripShare } from '../composables/useTripShare'
 import { useToasts } from '../composables/useToasts'
@@ -67,25 +67,40 @@ const props = defineProps<{
   trip: Trip
 }>()
 
-const { shareUrl, isCopied, isSharing, error: shareError, shareTrip, copyToClipboard } = useTripShare()
-const { success, warning, error } = useToasts()
+const emit = defineEmits<{
+  completeTrip: []
+}>()
 
-const canShare = computed(
+const { shareUrl, isCopied, isSharing, error: shareError, shareTrip, copyToClipboard } = useTripShare()
+const { success, error } = useToasts()
+
+const isReady = computed(
   () => props.trip.tripName.trim() !== '' || props.trip.destination.trim() !== ''
 )
 
+const heading = computed(() => {
+  if (!isReady.value) return 'Your trip is taking shape.'
+  if (isCopied.value) return 'Trip shared ✓'
+  return 'Ready to share?'
+})
+
+const description = computed(() => {
+  if (!isReady.value) return 'Complete your trip details to unlock sharing.'
+  if (isCopied.value) return 'Trip link copied — send it to your friends.'
+  return 'Send your adventure to your crew with one link.'
+})
+
 const buttonText = computed(() => {
   if (isSharing.value) return 'Creating link…'
-  if (!canShare.value) return 'Add a destination first'
+  if (!isReady.value) return 'Complete trip'
   return 'Share trip'
 })
 
-const handleShare = async () => {
-  if (!canShare.value) {
-    warning('Almost there', 'Give your trip a name or pick a destination to share it.')
+const handlePrimary = async () => {
+  if (!isReady.value) {
+    emit('completeTrip')
     return
   }
-
   const ok = await shareTrip(props.trip)
   if (ok) {
     success('Trip link copied', 'Send it to your friends — they can open and keep planning.')

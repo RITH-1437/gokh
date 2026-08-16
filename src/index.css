@@ -81,7 +81,7 @@
   .chip {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium
       bg-white border border-stone-200 text-ink-soft transition-all duration-200
-      hover:border-cambodia-300 hover:text-cambodia-700 active:scale-[.97];
+      hover:border-cambodia-300 hover:text-cambodia-700 active:scale-[.97] focus-ring;
   }
 }
 

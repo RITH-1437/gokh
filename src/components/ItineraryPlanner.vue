@@ -12,42 +12,43 @@
     <!-- Empty state -->
     <div v-if="itinerary.length === 0" class="surface !rounded-3xl px-6 py-10 flex flex-col items-center text-center">
       <Emoji3D emoji="🗺️" size="xl" float />
-      <p class="mt-5 font-extrabold text-ink text-lg">Your itinerary is empty.</p>
+      <p class="mt-5 font-extrabold text-ink text-lg">Your adventure is waiting.</p>
       <p class="text-sm text-ink-mute mt-1 max-w-sm">
-        Pick your dates first and the journey builds itself, day by day.
+        Choose your dates to start building your itinerary.
       </p>
-      <p v-if="!hasDates" class="mt-4 text-[13px] text-ink-mute bg-ivory rounded-full px-4 py-1.5">
-        Step 3 — When? Choose your dates to unlock the plan.
-      </p>
+      <button class="btn-primary mt-5" @click="emit('choose-dates')">
+        Choose dates
+        <Icon name="arrow-right" :size="16" />
+      </button>
     </div>
 
     <!-- Timeline -->
     <div v-else class="relative">
-      <div class="absolute left-[27px] sm:left-[31px] top-4 bottom-4 w-[2px] rounded-full bg-gradient-to-b from-cambodia-300/70 via-stone-200 to-stone-200" />
+      <div class="absolute left-[22px] sm:left-[31px] top-4 bottom-4 w-[2px] rounded-full bg-gradient-to-b from-cambodia-300/70 via-stone-200 to-stone-200" />
 
       <div v-for="(day, dayIndex) in itinerary" :key="day.dayNumber" class="relative pb-9">
         <!-- Day node -->
-        <div class="relative flex items-center gap-3.5 sm:gap-4">
+        <div class="relative flex items-center gap-2.5 sm:gap-4">
           <div class="relative z-10 flex-none">
             <div
               :class="[
-                'w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] rounded-2xl flex flex-col items-center justify-center shadow-glow border transition-colors duration-300',
+                'w-11 h-11 sm:w-[62px] sm:h-[62px] rounded-2xl flex flex-col items-center justify-center shadow-glow border transition-colors duration-300',
                 hasActivities(day)
                   ? 'bg-gradient-to-b from-cambodia-500 to-cambodia-700 border-cambodia-700 text-white ring-4 ring-cambodia-500/10'
                   : 'bg-white border-stone-200 text-ink'
               ]"
             >
-              <span class="text-[9px] sm:text-[10px] font-bold tracking-[0.16em]">DAY {{ String(day.dayNumber).padStart(2, '0') }}</span>
-              <span class="text-xl sm:text-2xl font-extrabold leading-none tnum">{{ dayDate(day.date).day }}</span>
-              <span class="text-[9px] sm:text-[10px] font-bold opacity-70">{{ dayDate(day.date).month }}</span>
+              <span class="text-[8px] sm:text-[10px] font-bold tracking-[0.14em]">DAY {{ String(day.dayNumber).padStart(2, '0') }}</span>
+              <span class="text-lg sm:text-2xl font-extrabold leading-none tnum">{{ dayDate(day.date).day }}</span>
+              <span class="text-[8px] sm:text-[10px] font-bold opacity-70">{{ dayDate(day.date).month }}</span>
             </div>
           </div>
 
           <div class="min-w-0">
-            <div class="font-extrabold text-ink text-lg sm:text-xl leading-tight">
+            <div class="font-extrabold text-ink text-base sm:text-xl leading-tight">
               {{ formatDate(day.date) }}
             </div>
-            <div class="text-[13px] text-ink-mute">
+            <div class="text-[12px] sm:text-[13px] text-ink-mute">
               {{ dayName(day.date) }}
             </div>
           </div>
@@ -59,20 +60,20 @@
               {{ day.activities.length }} stop{{ day.activities.length > 1 ? 's' : '' }}
             </span>
             <!-- Weather chip for this day -->
-            <div v-if="weatherLoading" class="skeleton w-20 h-8" />
+            <div v-if="weatherLoading" class="skeleton w-14 h-7 sm:w-20 sm:h-8" />
             <div
               v-else-if="dayWeather(day.date)"
-              class="chip !pointer-events-none !bg-white"
+              class="chip !pointer-events-none !bg-white whitespace-nowrap"
               :title="`${dayWeather(day.date)!.temperature}°C · ${dayWeather(day.date)!.rainChance}% rain`"
             >
-              <span class="text-[14px]">{{ weatherEmoji(dayWeather(day.date)!.weatherCode) }}</span>
-              <span class="tnum">{{ dayWeather(day.date)!.temperature }}°C</span>
+              <span class="text-[13px] sm:text-[14px]">{{ weatherEmoji(dayWeather(day.date)!.weatherCode) }}</span>
+              <span class="tnum text-[12px] sm:text-[13px]">{{ dayWeather(day.date)!.temperature }}°C</span>
             </div>
           </div>
         </div>
 
         <!-- Activities -->
-        <div class="pl-[64px] sm:pl-[78px] mt-4 space-y-2.5">
+        <div class="mt-4 space-y-2.5 sm:pl-[78px]">
           <div
             v-for="(activity, actIndex) in day.activities"
             :key="activity.id"
@@ -95,32 +96,34 @@
                 </div>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <div class="font-bold text-ink text-[15px] leading-snug">{{ activity.name }}</div>
-                  <span v-if="activity.startTime && activity.endTime" class="chip !bg-ivory tnum text-[11.5px]">
+                <h4 class="font-bold text-ink text-[15px] leading-snug break-words">{{ activity.name }}</h4>
+
+                <div v-if="activity.startTime || activity.endTime" class="mt-1.5 flex flex-wrap gap-2">
+                  <span v-if="activity.startTime && activity.endTime" class="chip !bg-ivory tnum text-[11.5px] whitespace-nowrap">
                     <Icon name="clock" :size="12" class="text-cambodia-700" />
                     {{ activity.startTime }}–{{ activity.endTime }}
                     <span class="text-ink-mute">· {{ timeDuration(activity.startTime, activity.endTime) }}</span>
                   </span>
-                  <span v-else-if="activity.startTime" class="chip !bg-ivory tnum text-[11.5px]">
+                  <span v-else-if="activity.startTime" class="chip !bg-ivory tnum text-[11.5px] whitespace-nowrap">
                     <Icon name="clock" :size="12" class="text-cambodia-700" />
                     {{ activity.startTime }}
                   </span>
                 </div>
+
                 <p v-if="activity.description" class="text-[13.5px] text-ink-soft mt-1.5 leading-relaxed">
                   {{ activity.description }}
                 </p>
 
                 <div class="mt-3 flex flex-wrap items-center gap-2">
                   <!-- Activity weather -->
-                  <span v-if="dayWeather(day.date)" class="chip !pointer-events-none !bg-ivory">
+                  <span v-if="dayWeather(day.date)" class="chip !pointer-events-none !bg-ivory whitespace-nowrap">
                     {{ weatherEmoji(dayWeather(day.date)!.weatherCode) }}
                     {{ dayWeather(day.date)!.temperature }}°C
                     · {{ dayWeather(day.date)!.rainChance }}% rain
                   </span>
 
                   <button
-                    class="chip group"
+                    class="chip group whitespace-nowrap"
                     @click="emit('directions', activity.name || destination)"
                   >
                     <Icon name="navigation-2" :size="13" class="text-cambodia-600" />
@@ -134,6 +137,7 @@
                 <button
                   class="p-1.5 rounded-lg text-ink-mute hover:text-cambodia-700 hover:bg-cambodia-50 transition-colors"
                   title="Edit activity"
+                  aria-label="Edit activity"
                   @click="startEdit(dayIndex, actIndex)"
                 >
                   <Icon name="edit" :size="14" />
@@ -141,6 +145,7 @@
                 <button
                   class="p-1.5 rounded-lg text-ink-mute hover:text-clay-600 hover:bg-clay-100 transition-colors"
                   title="Remove activity"
+                  aria-label="Remove activity"
                   @click="removeActivity(dayIndex, actIndex)"
                 >
                   <Icon name="trash-2" :size="14" />
@@ -269,11 +274,9 @@ const emit = defineEmits<{
   updateActivity: [dayIndex: number, actIndex: number, field: keyof Activity, value: string]
   removeActivity: [dayIndex: number, actIndex: number]
   directions: [location: string]
+  chooseDates: []
 }>()
 
-const hasDates = computed(
-  () => props.itinerary.length > 0 && props.itinerary.some(d => !!d.date)
-)
 const suggestions = computed(() => getSuggestionsForDestination(props.destination))
 
 const hasActivities = (day: ItineraryDay) => day.activities.length > 0

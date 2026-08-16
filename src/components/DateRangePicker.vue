@@ -6,6 +6,7 @@
         <p class="text-[13px] font-semibold text-ink-soft mb-2">Start</p>
         <button
           type="button"
+          aria-label="Pick start date"
           class="w-full flex flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-stone-200/80 bg-white px-2 py-4 sm:py-5 transition-all duration-200 hover:border-cambodia-300 hover:-translate-y-0.5 hover:shadow-soft focus-ring active:scale-[.98]"
           @click="pick('start')"
         >
@@ -34,6 +35,7 @@
         <p class="text-[13px] font-semibold text-ink-soft mb-2">End</p>
         <button
           type="button"
+          aria-label="Pick end date"
           class="w-full flex flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-stone-200/80 bg-white px-2 py-4 sm:py-5 transition-all duration-200 hover:border-cambodia-300 hover:-translate-y-0.5 hover:shadow-soft focus-ring active:scale-[.98]"
           @click="pick('end')"
         >

@@ -35,6 +35,7 @@
           :value="formattedBudget"
           type="text"
           inputmode="decimal"
+          aria-label="Trip budget amount"
           :placeholder="budget.currency === 'USD' ? '100' : '400,000'"
           class="w-full max-w-[300px] bg-transparent text-5xl sm:text-6xl font-extrabold text-ink tnum focus:outline-none border-b-2 border-transparent focus:border-cambodia-300 transition-colors"
           @input="handleBudgetInput"

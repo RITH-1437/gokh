@@ -26,6 +26,7 @@
             <button
               class="opacity-40 group-hover:opacity-90 hover:text-sand-300 transition-opacity"
               title="Edit trip name"
+              aria-label="Edit trip name"
               @click="startEditName"
             >
               <Icon name="edit" :size="14" />

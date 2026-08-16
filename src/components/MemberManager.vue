@@ -13,6 +13,7 @@
             v-if="editingMemberId !== member.id"
             class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border border-stone-200 text-ink-mute shadow-soft flex items-center justify-center hover:text-cambodia-700 hover:border-cambodia-300 transition-colors"
             title="Edit name"
+            aria-label="Edit name"
             @click="startEdit(member)"
           >
             <Icon name="edit" :size="12" />
@@ -42,6 +43,7 @@
             v-if="member.role !== 'leader'"
             class="p-1 rounded-full text-ink-mute hover:text-sand-600 transition-colors"
             title="Make trip leader"
+            aria-label="Make trip leader"
             @click="makeLeader(member)"
           >
             <Icon name="crown" :size="14" />
@@ -49,6 +51,7 @@
           <button
             class="p-1 rounded-full text-ink-mute hover:text-clay-600 transition-colors"
             title="Remove traveler"
+            aria-label="Remove traveler"
             @click="removeMember(member)"
           >
             <Icon name="trash-2" :size="14" />
@@ -76,12 +79,12 @@
     >
       <Emoji3D emoji="🧑‍🤝‍🧑" size="lg" shape="tile" float />
       <div class="flex-1 min-w-0">
-        <p class="font-bold text-ink">No crew yet.</p>
-        <p class="text-sm text-ink-mute mt-0.5">Add your first traveler — the first one becomes the trip leader.</p>
+        <p class="font-bold text-ink text-lg leading-snug">Who's joining the adventure?</p>
+        <p class="text-sm text-ink-mute mt-1">Add your crew and choose a trip leader — the first traveler becomes the leader.</p>
       </div>
       <button class="btn-primary shrink-0" @click="showAdd = true">
         <Icon name="plus" :size="18" />
-        Add your crew
+        Add traveler
       </button>
     </div>
 

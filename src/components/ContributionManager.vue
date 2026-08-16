@@ -40,6 +40,7 @@
             :value="getContributionAmount(member)"
             type="text"
             inputmode="decimal"
+            :aria-label="`${member.name} contribution`"
             :placeholder="placeholderFor(member)"
             class="w-24 pl-7 pr-2 py-2 rounded-xl bg-ivory border border-stone-200 text-[14px] font-bold text-ink tnum focus:outline-none focus:border-cambodia-400 focus:ring-4 focus:ring-cambodia-100 transition-all"
             @input="handleContributionInput(member.id, $event)"

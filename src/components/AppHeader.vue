@@ -23,7 +23,7 @@
         </span>
 
         <button
-          class="btn-primary !h-10 !px-4 sm:!px-5 text-sm"
+          class="btn-primary !h-10 !px-4 sm:!px-5 text-sm shrink-0"
           :disabled="isSharing"
           @click="emit('share')"
         >

@@ -18,8 +18,8 @@
     </div>
 
     <!-- Content -->
-    <div class="flex-1 min-w-0 pb-12 sm:pb-16">
-      <header class="mb-5 sm:mb-7">
+    <div class="flex-1 min-w-0 pb-10 sm:pb-12">
+      <header class="mb-4 sm:mb-6">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-sand-600">
             Step {{ String(step).padStart(2, '0') }}
