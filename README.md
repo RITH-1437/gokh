@@ -1,54 +1,70 @@
-# GoKH 🇰🇭 — Modern Cambodian Trip Planner
+# GoKH 🇰🇭 — Plan a Cambodia trip together
 
-GoKH is a modern, single-page trip planner for Cambodia, designed with a premium user experience in mind. It allows users to collaboratively plan their trip's destination, travelers, dates, budget, and itinerary, all within a polished, responsive interface.
+GoKH is a single-page trip planner for Cambodia. Pick a destination, add your
+travel crew, choose dates, transport and accommodation, split a budget, build a
+day-by-day itinerary — then share the whole plan as one link. No account and no
+server: the trip lives in the link and in your browser.
 
-The project's primary focus is on high-quality UI/UX design, transforming a functional concept into a visually attractive product that feels like a modern travel startup MVP.
+## Features
 
----
+- **Destinations** — 20 Cambodian destinations with suggested stay, best season
+  and a "good time to go?" hint, entry fees, good-to-know tips, curated
+  activity ideas and travel-advice flags (see [docs/CONTENT.md](docs/CONTENT.md)).
+  Any other place can be typed in freely.
+- **Crew** — add, rename and remove travelers; exactly one trip leader.
+- **Dates** — start/end picker (up to 90 days); the itinerary days are generated
+  automatically and keep their activities when dates change.
+- **Transport & stay** — motorcycle / van / bus, hotel / guesthouse / camping.
+- **Budget** — USD or KHR (fixed 1 USD = 4,000 KHR), per-traveler split and
+  contribution tracking.
+- **Itinerary** — activities with times and notes, one-tap suggestions,
+  7 / 10 / 14-day route templates, and a live Open-Meteo forecast for trips
+  within the next 14 days.
+- **Before you go** — a crew checklist (visa, e-Arrival card, cash…) shared in
+  the trip link, plus airports, seasons, transport and safety essentials.
+- **Share** — copy a link containing the whole trip; friends open it and keep planning.
+- **Autosave** — the draft is kept in `localStorage`, so a refresh doesn't lose it.
 
-## ✨ Key Features
+## Tech stack
 
-*   **Modern Design System:** A consistent and professional UI built with a custom-configured Tailwind CSS theme.
-*   **Responsive Layout:** A beautiful and functional experience on all devices, from mobile phones to large desktops.
-*   **Interactive Planner:** A two-column layout on desktop for efficient planning and a clear overview.
-*   **Visual Components:**
-    *   Attractive destination and transportation selectors.
-    *   Polished traveler pills with a distinct "Trip Leader" badge.
-    *   An interactive budget section with currency toggling (USD/KHR) and contribution breakdowns.
-    *   A timeline-style itinerary to visualize the trip day-by-day.
-    *   Clean, modern cards for weather, activities, and dates.
-*   **Mobile-First UX:** Includes a floating "Share" button on mobile for easy access to the primary call-to-action.
-*   **Subtle Animations:** Smooth transitions and micro-interactions that make the UI feel alive and responsive.
+Vue 3.5 (`<script setup>`, TypeScript) · Vite 8 · Tailwind CSS 3 · Vitest +
+Vue Test Utils (happy-dom) · deployed on Vercel. One runtime dependency: `vue`.
 
-## 🛠️ Tech Stack
+## Getting started
 
-*   **Framework:** Vue 3 with `<script setup>` syntax
-*   **Build Tool:** Vite
-*   **Language:** TypeScript
-*   **Styling:** Tailwind CSS with a custom design system
-*   **Icons:** Lightweight inline SVG icon set
+Requires Node.js `^20.19.0 || >=22.12.0`.
 
-## 🚀 Project Setup
+```bash
+git clone https://github.com/RITH-1437/gokh.git
+cd gokh
+npm install
+npm run dev          # http://localhost:5173
+```
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/RITH-1437/gokh.git
-    cd gokh
-    ```
+No environment variables or API keys are needed.
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
+## Scripts
 
-3.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-    The application will be available at `http://localhost:5173` (or the next available port).
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Vite dev server with HMR |
+| `npm run build` | Type-check (`vue-tsc`) then production build to `dist/` |
+| `npm run build:only` | Production build without type-check |
+| `npm run typecheck` | `vue-tsc` type-check only |
+| `npm test` | Run unit and component tests once |
+| `npm run test:watch` | Tests in watch mode |
+| `npm run preview` | Serve `dist/` with the production security headers |
+| `npm run check` | Type-check + tests + build (what CI runs) |
 
-## 📜 Available Scripts
+## Documentation
 
-*   `npm run dev`: Starts the Vite development server with Hot Module Replacement (HMR).
-*   `npm run build`: Compiles the TypeScript and Vue components and bundles the application for production.
-*   `npm run preview`: Serves the production build locally to preview before deployment.
+| Document | Contents |
+| --- | --- |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure, data flow, share-link format, persistence |
+| [docs/CONTENT.md](docs/CONTENT.md) | Destination & activity data and how to keep it current |
+| [docs/Cambodia-destination.md](docs/Cambodia-destination.md) | Source research report the content is based on |
+| [docs/IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md) | Credits and licenses for linked Wikimedia photos |
+| [docs/SECURITY.md](docs/SECURITY.md) | Threat model, input sanitization, headers |
+| [docs/TESTING.md](docs/TESTING.md) | Test suite and how to run it |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment and CI |
+| [CHANGELOG.md](CHANGELOG.md) | Notable changes |

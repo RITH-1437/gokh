@@ -18,18 +18,23 @@ import ContributionManager from './components/ContributionManager.vue'
 import ItineraryPlanner from './components/ItineraryPlanner.vue'
 import TripPreview from './components/TripPreview.vue'
 import ShareTrip from './components/ShareTrip.vue'
+import BeforeYouGo from './components/BeforeYouGo.vue'
 import { useTrip } from './composables/useTrip'
 import { useWeather } from './composables/useWeather'
 import { useTripShare } from './composables/useTripShare'
 import { useToasts } from './composables/useToasts'
 import { findDestination } from './data/destinations'
+import { ROUTE_TEMPLATES, planRouteTemplate } from './data/routes'
+import { PRE_TRIP_CHECKLIST } from './data/essentials'
 import type { Activity } from './types/trip'
-import { formatTripRange } from './utils/dates'
+import { formatTripRange, parseISODate } from './utils/dates'
 import { formatCurrency } from './utils/currency'
+import { createId } from './utils/id'
 
 const {
   trip,
   loadTripFromUrl,
+  restoreSavedTrip,
   loadedFromUrl,
   hasUnsavedEdits,
   clearSharedTripFlag,
@@ -40,17 +45,19 @@ const {
   isOverBudget,
   perPersonBudget,
   updateContribution,
+  toggleChecklistItem,
   resetTrip
-} = useTrip()
+} = useTrip({ persist: true })
 
 const {
   weather,
   isLoading: weatherLoading,
   error: weatherError,
-  fetchWeather
+  fetchWeather,
+  clear: clearWeather
 } = useWeather()
 
-const { shareTrip } = useTripShare()
+const { shareTrip, error: shareError } = useTripShare()
 const toasts = useToasts()
 
 const isSharing = ref(false)
@@ -78,9 +85,15 @@ watch(
   }
 )
 
-// Load trip from URL on mount
-onMounted(() => {
-  loadTripFromUrl()
+// On start-up a shared link wins; otherwise restore the local draft.
+onMounted(async () => {
+  const status = await loadTripFromUrl()
+  if (status === 'invalid') {
+    toasts.error('This share link is broken', 'It may have been cut off when copied. Ask for the link again.', 6000)
+  }
+  if (status !== 'loaded' && (await restoreSavedTrip())) {
+    toasts.info('Welcome back', 'We restored the trip you were planning.')
+  }
 })
 
 // Fetch weather when trip context changes
@@ -89,6 +102,8 @@ watch(
   ([destination, startDate, endDate]) => {
     if (destination && startDate && endDate) {
       fetchWeather(destination, startDate, endDate)
+    } else {
+      clearWeather()
     }
   },
   { deep: true }
@@ -137,7 +152,7 @@ const scrollToPreview = () => {
 // Activities
 const handleAddActivity = (dayIndex: number, activity: { name: string; startTime?: string; endTime?: string; description?: string }) => {
   const newActivity: Activity = {
-    id: Date.now().toString(),
+    id: createId(),
     name: activity.name,
     description: activity.description || '',
     startTime: activity.startTime || '',
@@ -156,6 +171,30 @@ const handleRemoveActivity = (dayIndex: number, actIndex: number) => {
   trip.value.itinerary[dayIndex].activities.splice(actIndex, 1)
   toasts.info('Activity removed', removed ? `"${removed.name}" is off the plan` : undefined)
 }
+
+// Fill empty itinerary days from a route template (never touches planned days).
+const handleApplyTemplate = (templateId: string) => {
+  const template = ROUTE_TEMPLATES.find(t => t.id === templateId)
+  if (!template) return
+  const plan = planRouteTemplate(template, trip.value.itinerary.map(d => d.activities.length > 0))
+  plan.forEach(({ dayIndex, names }) => {
+    trip.value.itinerary[dayIndex].activities.push(
+      ...names.map(name => ({ id: createId(), name, description: '', startTime: '', endTime: '' }))
+    )
+  })
+  const tripDays = trip.value.itinerary.length
+  const note = template.days.length > tripDays
+    ? `Your trip has ${tripDays} day${tripDays > 1 ? 's' : ''}, so we used the first ${tripDays} of ${template.days.length}.`
+    : `${plan.length} day${plan.length > 1 ? 's' : ''} planned — edit anything you like.`
+  toasts.success(`${template.name} added`, note)
+}
+
+const checklistTotal = PRE_TRIP_CHECKLIST.length
+
+// Month used for the destination "good time to go?" hint.
+const travelMonth = computed(() =>
+  trip.value.startDate ? parseISODate(trip.value.startDate).getMonth() + 1 : new Date().getMonth() + 1
+)
 
 const getDirections = (location: string) => {
   if (!location) return
@@ -177,6 +216,8 @@ const handleShare = async () => {
   isSharing.value = false
   if (ok) {
     toasts.success('Trip link copied', 'Send it to your friends — they can open and keep planning.')
+  } else {
+    toasts.error("Couldn't copy the link", shareError.value || 'Please try again.')
   }
 }
 
@@ -286,7 +327,7 @@ const mobileSummary = computed(() => {
                 subtitle="Pick a place and let's start the adventure."
                 :done="!!trip.destination"
               >
-                <DestinationSelector v-model="trip.destination" />
+                <DestinationSelector v-model="trip.destination" :travel-month="travelMonth" />
               </SectionShell>
             </Reveal>
 
@@ -381,7 +422,6 @@ const mobileSummary = computed(() => {
                 title="What's the plan?"
                 subtitle="Build the journey, day by day."
                 :done="trip.itinerary.some(d => d.activities.length > 0)"
-                last
               >
                 <ItineraryPlanner
                   :itinerary="trip.itinerary"
@@ -394,7 +434,21 @@ const mobileSummary = computed(() => {
                   @remove-activity="handleRemoveActivity"
                   @directions="getDirections"
                   @choose-dates="scrollTo('step-when')"
+                  @apply-template="handleApplyTemplate"
                 />
+              </SectionShell>
+            </Reveal>
+
+            <Reveal>
+              <SectionShell
+                id="step-prepare"
+                :step="8"
+                title="Before you go"
+                subtitle="Optional — a checklist the whole crew shares, plus the essentials."
+                :done="(trip.checklist?.length ?? 0) > 0 && trip.checklist?.length === checklistTotal"
+                last
+              >
+                <BeforeYouGo :checklist="trip.checklist ?? []" @toggle="toggleChecklistItem" />
               </SectionShell>
             </Reveal>
 

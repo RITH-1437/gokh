@@ -41,7 +41,7 @@
             type="text"
             inputmode="decimal"
             :aria-label="`${member.name} contribution`"
-            :placeholder="placeholderFor(member)"
+            :placeholder="placeholderFor()"
             class="w-24 pl-7 pr-2 py-2 rounded-xl bg-ivory border border-stone-200 text-[14px] font-bold text-ink tnum focus:outline-none focus:border-cambodia-400 focus:ring-4 focus:ring-cambodia-100 transition-all"
             @input="handleContributionInput(member.id, $event)"
           />
@@ -62,9 +62,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Member, Budget, Currency } from '../types/trip'
-import { formatCurrency } from '../utils/currency'
+import { formatCurrency, convertCurrency, parseAmountInput } from '../utils/currency'
 import { validateContribution } from '../utils/validation'
-import { useToasts } from '../composables/useToasts'
 import Avatar from './Avatar.vue'
 import WarningAlert from './WarningAlert.vue'
 
@@ -78,7 +77,6 @@ const emit = defineEmits<{
   updateContribution: [memberId: string, amount: number, currency: Currency]
 }>()
 
-const { error } = useToasts()
 const contributionWarning = ref('')
 
 const getContributionAmount = (member: Member): string => {
@@ -92,23 +90,18 @@ const getContributionAmount = (member: Member): string => {
 const getContributionPercentage = (member: Member): number => {
   const contribution = props.budget.contributions.find(c => c.memberId === member.id)
   if (!contribution || props.budget.total <= 0) return 0
-  const amount = contribution.currency === props.budget.currency
-    ? contribution.amount
-    : contribution.currency === 'USD'
-      ? contribution.amount * 4000
-      : contribution.amount / 4000
+  const amount = convertCurrency(contribution.amount, contribution.currency, props.budget.currency)
   return Math.min(Math.round((amount / props.budget.total) * 100), 100)
 }
 
-const placeholderFor = (member: Member) => {
+const placeholderFor = () => {
   if (props.perPersonBudget > 0) return formatCurrency(props.perPersonBudget, props.budget.currency)
   return '0'
 }
 
 const handleContributionInput = (memberId: string, event: Event) => {
   const target = event.target as HTMLInputElement
-  const value = target.value.replace(/,/g, '')
-  const numValue = parseFloat(value) || 0
+  const numValue = parseAmountInput(target.value)
 
   const validation = validateContribution(numValue, props.members.length, props.budget.total)
   if (validation.errors.length > 0) {

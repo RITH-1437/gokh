@@ -15,7 +15,7 @@
           :style="{ transform: activeCurrencyIndex ? 'translateX(100%)' : 'translateX(0)' }"
         />
         <button
-          v-for="(curr, i) in currencies"
+          v-for="curr in currencies"
           :key="curr"
           type="button"
           class="relative z-10 flex-1 px-4 sm:px-5 py-1.5 text-[13px] font-bold rounded-xl transition-colors duration-200"
@@ -93,7 +93,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { Budget, Currency } from '../types/trip'
-import { USD_TO_KHR, formatCurrency, formatNumber, convertCurrency, currencySymbol } from '../utils/currency'
+import { USD_TO_KHR, formatCurrency, formatNumber, convertCurrency, currencySymbol, parseAmountInput } from '../utils/currency'
 import { validateBudget } from '../utils/validation'
 import { useAnimatedNumber } from '../composables/useAnimatedNumber'
 import Emoji3D from './Emoji3D.vue'
@@ -176,8 +176,7 @@ const selectCurrency = (currency: Currency) => {
 
 const handleBudgetInput = (event: Event) => {
   const target = event.target as HTMLInputElement
-  const value = target.value.replace(/,/g, '')
-  const numValue = parseFloat(value) || 0
+  const numValue = parseAmountInput(target.value)
   const validation = validateBudget(numValue, budget.value.currency)
   budgetWarning.value = validation.isValid ? validation.warnings[0] || '' : validation.errors[0] || ''
   emit('update:modelValue', { ...budget.value, total: numValue })

@@ -24,6 +24,8 @@
           <div v-if="editingMemberId === member.id" class="flex items-center gap-1">
             <input
               v-model="editingMemberName"
+              aria-label="Traveler name"
+              maxlength="50"
               class="w-20 h-8 px-2 text-[13px] rounded-lg border border-cambodia-400 focus:outline-none focus:ring-4 focus:ring-cambodia-100"
               @keyup.enter="saveEdit"
               @keyup.esc="cancelEdit"
@@ -105,6 +107,8 @@
           type="text"
           class="field !h-12 flex-1"
           placeholder="Traveler name"
+          aria-label="Traveler name"
+          maxlength="50"
           autofocus
           @keyup.enter="addMember"
           @keyup.esc="showAdd = false"

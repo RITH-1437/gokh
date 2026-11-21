@@ -59,6 +59,8 @@ export interface Trip {
   accommodation: Accommodation
   budget: Budget
   itinerary: ItineraryDay[]
+  /** Ids of completed "Before you go" checklist items (shared with the group). */
+  checklist?: string[]
 }
 
 export interface WeatherDay {
@@ -75,8 +77,32 @@ export interface Destination {
   tagline?: string
   suggestedName?: string
   image?: string
+  /** Required attribution for remote (Wikimedia Commons) photos. */
+  imageCredit?: ImageCredit
+  /** Suggested length of stay, e.g. "2–3 days" (docs/Cambodia-destination.md). */
+  days?: string
+  /** Best months to visit, e.g. "Nov–May". */
+  bestSeason?: string
+  /** Safety / access note shown to travellers. Review before each season. */
+  advisory?: string
+  /** Entry fees for foreign adults. Verified on FEES_CHECKED (data/destinations.ts). */
+  fees?: EntryFee[]
+  /** Etiquette / good-to-know notes, e.g. dress codes or content notes. */
+  tips?: string[]
   coordinates?: {
     lat: number
     lon: number
   }
+}
+
+export interface EntryFee {
+  label: string
+  price: string
+  note?: string
+}
+
+export interface ImageCredit {
+  author: string
+  license: string
+  source: string
 }

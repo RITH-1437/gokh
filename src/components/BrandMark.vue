@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import logo from '../assets/images/logo.png'
+import logo from '../assets/images/logo.webp'
 
 const props = withDefaults(defineProps<{
   size?: number

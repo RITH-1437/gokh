@@ -33,3 +33,15 @@ export const convertCurrency = (amount: number, from: Currency, to: Currency): n
 }
 
 export const getCurrencySymbol = (currency: Currency): string => currencySymbol(currency)
+
+// Parses free-typed money input ("1,250.50", "$300", "-5") into a safe,
+// non-negative number. Anything that isn't a digit or "." is ignored, so
+// negative amounts can no longer be entered.
+export const MAX_AMOUNT = 1_000_000_000_000
+
+export const parseAmountInput = (raw: string): number => {
+  const cleaned = raw.replace(/[^\d.]/g, '')
+  const value = parseFloat(cleaned)
+  if (!Number.isFinite(value) || value <= 0) return 0
+  return Math.min(value, MAX_AMOUNT)
+}

@@ -1,140 +1,135 @@
 <template>
-  <section class="relative overflow-hidden">
-    <!-- Decorative background -->
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <div
-        class="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-40"
-        style="background: radial-gradient(closest-side, #E2BD76, transparent)"
-      />
-      <div
-        class="absolute top-32 -left-32 w-80 h-80 rounded-full opacity-30"
-        style="background: radial-gradient(closest-side, #BAD9C7, transparent)"
-      />
-      <svg class="absolute inset-x-0 top-6 w-full h-40 opacity-[0.16] hidden lg:block" viewBox="0 0 800 100" preserveAspectRatio="none">
-        <path d="M0 60 C 140 20, 240 90, 380 50 S 640 20, 800 55" fill="none" stroke="#2C6B4C" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round" />
-      </svg>
-    </div>
+  <section class="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-5">
+    <div class="relative isolate overflow-hidden rounded-[28px] sm:rounded-[36px] bg-cambodia-900 text-white shadow-lift min-h-[560px] lg:min-h-[600px] flex">
+      <!-- Destination photo (crossfades when the destination changes) -->
+      <Transition
+        enter-active-class="transition-opacity duration-700 ease-out"
+        enter-from-class="opacity-0"
+        leave-active-class="transition-opacity duration-700 ease-out absolute inset-0"
+        leave-to-class="opacity-0"
+      >
+        <img
+          :key="heroImage"
+          :src="heroImage"
+          alt=""
+          aria-hidden="true"
+          fetchpriority="high"
+          decoding="async"
+          class="absolute inset-0 -z-10 h-full w-full object-cover animate-ken-burns"
+          @error="failedImage = heroImage"
+        />
+      </Transition>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-6">
-      <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-10 lg:gap-4 items-center">
+      <!-- Legibility overlays -->
+      <div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-black/20 lg:bg-gradient-to-r lg:from-black/75 lg:via-black/40 lg:to-black/5" aria-hidden="true" />
+      <div class="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
+
+      <div class="relative w-full px-6 sm:px-10 lg:px-14 py-10 sm:py-14 lg:py-16 grid lg:grid-cols-[1.15fr_.85fr] gap-10 lg:gap-12 items-end lg:items-center">
         <!-- Copy -->
-        <div class="text-center lg:text-left">
-          <div class="animate-fade-up inline-flex items-center gap-2 rounded-full bg-white/80 border border-sand-200/70 px-4 py-1.5 text-[13px] font-semibold text-ink-soft shadow-soft" style="animation-delay: 60ms">
+        <div class="max-w-xl">
+          <div class="animate-fade-up glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-semibold text-white/95" style="animation-delay: 60ms">
             <span class="text-[15px]">🇰🇭</span>
             Explore Cambodia together
           </div>
 
-          <h1 class="animate-fade-up mt-5 text-[40px] leading-[1.05] sm:text-6xl font-extrabold tracking-tight text-ink" style="animation-delay: 140ms">
+          <h1 class="animate-fade-up mt-5 text-[44px] leading-[1.02] sm:text-6xl lg:text-7xl font-extrabold tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,.35)]" style="animation-delay: 140ms">
             Plan your
-            <span class="text-cambodia-600">Cambodia</span>
+            <span class="text-sand-300">Cambodia</span>
             adventure.
           </h1>
 
-          <p class="animate-fade-up mt-4 text-base sm:text-lg text-ink-soft leading-relaxed max-w-md mx-auto lg:mx-0" style="animation-delay: 220ms">
-            Build the trip. Bring your crew.
-            Share the journey with one link.
+          <p class="animate-fade-up mt-5 text-base sm:text-lg text-white/85 leading-relaxed max-w-md" style="animation-delay: 220ms">
+            Temples at sunrise, islands at sunset. Build the trip, bring your crew,
+            and share the whole plan with one link.
           </p>
 
-          <div class="animate-fade-up mt-7 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3" style="animation-delay: 300ms">
-            <button class="btn-primary w-full sm:w-auto text-base" @click="emit('start')">
+          <div class="animate-fade-up mt-8 flex flex-col sm:flex-row gap-3" style="animation-delay: 300ms">
+            <button class="btn-gold w-full sm:w-auto !h-[52px] !px-7 text-base" @click="emit('start')">
               <span>Start planning</span>
               <Icon name="arrow-right" :size="18" />
             </button>
-            <button class="btn-ghost w-full sm:w-auto" @click="emit('preview')">
-              <Icon name="sparkles" :size="17" class="text-sand-500" />
+            <button
+              class="glass inline-flex items-center justify-center gap-2 h-[52px] px-6 rounded-2xl font-semibold text-[15px] text-white hover:bg-white/20 transition-colors duration-200 focus-ring w-full sm:w-auto"
+              @click="emit('preview')"
+            >
+              <Icon name="sparkles" :size="17" class="text-sand-300" />
               View trip card
             </button>
           </div>
 
-          <!-- Compact emoji row (mobile) -->
-          <div class="animate-fade-up mt-8 flex justify-center lg:hidden" style="animation-delay: 380ms">
-            <div class="flex -space-x-2">
-              <Emoji3D emoji="🛕" size="sm" shape="tile" />
-              <Emoji3D emoji="🛵" size="sm" shape="tile" float :float-delay="400" />
-              <Emoji3D emoji="📍" size="sm" shape="tile" float :float-delay="900" />
-              <Emoji3D emoji="🌴" size="sm" shape="tile" />
+          <div class="animate-fade-up mt-8 flex items-center gap-2 text-[12.5px] text-white/70" style="animation-delay: 380ms">
+            <Icon name="map-pin" :size="14" />
+            <span>{{ heroCaption }}</span>
+          </div>
+        </div>
+
+        <!-- Live trip card -->
+        <div class="animate-fade-up lg:justify-self-end w-full lg:max-w-sm" style="animation-delay: 420ms">
+          <div class="glass-strong rounded-3xl p-5 sm:p-6">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-sand-200">Your trip</span>
+              <span v-if="loadedFromUrl" class="inline-flex items-center gap-1.5 text-[12px] font-semibold bg-white/15 rounded-full px-2.5 py-1">
+                <Icon name="link" :size="12" />
+                Shared
+              </span>
             </div>
-          </div>
-        </div>
 
-        <!-- 3D travel scene (desktop) -->
-        <div class="hidden lg:block relative h-[360px]" aria-hidden="true">
-          <div class="animate-pop-in absolute inset-0 m-auto flex items-center justify-center" style="animation-delay: 320ms">
-            <Emoji3D emoji="🛕" size="xl" float />
-          </div>
-          <div class="animate-pop-in absolute left-[6%] top-[12%]" style="animation-delay: 400ms">
-            <Emoji3D emoji="📍" size="sm" float :float-delay="500" />
-          </div>
-          <div class="animate-pop-in absolute right-[8%] top-[18%]" style="animation-delay: 460ms">
-            <Emoji3D emoji="🛵" size="md" float :float-delay="1200" />
-          </div>
-          <div class="animate-pop-in absolute left-[10%] bottom-[6%]" style="animation-delay: 520ms">
-            <Emoji3D emoji="🏖️" size="sm" shape="tile" float :float-delay="1800" />
-          </div>
-          <div class="animate-pop-in absolute right-[14%] bottom-[10%]" style="animation-delay: 580ms">
-            <Emoji3D emoji="🌴" size="md" shape="tile" float :float-delay="700" />
-          </div>
-          <div class="animate-pop-in absolute right-[30%] top-[4%]" style="animation-delay: 640ms">
-            <Emoji3D emoji="🥥" size="xs" float :float-delay="2200" />
-          </div>
-          <div class="animate-pop-in absolute left-[24%] bottom-[2%]" style="animation-delay: 700ms">
-            <Emoji3D emoji="🏍️" size="sm" float :float-delay="1500" />
-          </div>
-        </div>
-      </div>
+            <div class="mt-2 text-2xl font-extrabold tracking-tight leading-tight truncate">
+              {{ trip.tripName || trip.destination || 'Your next adventure' }}
+            </div>
 
-      <!-- Live trip preview strip -->
-      <div class="animate-fade-up mt-10 lg:mt-12" style="animation-delay: 400ms">
-        <div class="surface !rounded-2xl px-5 py-4">
-          <div class="flex flex-wrap items-center gap-x-5 gap-y-2.5">
-            <span class="text-[11px] font-bold tracking-[0.18em] uppercase text-sand-600">
-              Your trip
-            </span>
-
-            <template v-if="hasAnyDetails">
-              <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <span class="text-base">📍</span>
-                <span v-if="trip.destination">{{ trip.destination }}</span>
-                <span v-else class="text-ink-mute">Choose a destination</span>
-              </span>
-
-              <span v-if="trip.startDate && trip.endDate" class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink tnum">
-                <span class="text-base">🗓️</span>
-                {{ formatTripRange(trip.startDate, trip.endDate) }}
-              </span>
-
-              <span v-if="trip.members.length" class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <span class="text-base">👥</span>
-                {{ trip.members.length }} traveler{{ trip.members.length > 1 ? 's' : '' }}
-              </span>
-
-              <span v-if="trip.budget.total > 0" class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink tnum">
-                <span class="text-base">💰</span>
-                {{ formatCurrency(trip.budget.total, trip.budget.currency) }}
-              </span>
-            </template>
-
-            <span v-else class="text-sm text-ink-mute">
-              Ready when you are — pick a destination to begin.
-            </span>
-
-            <span v-if="loadedFromUrl" class="ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold text-cambodia-700 bg-cambodia-50 border border-cambodia-200/70 rounded-full px-3 py-1">
-              <Icon name="link" :size="14" />
-              Shared trip
-            </span>
+            <ul v-if="hasAnyDetails" class="mt-4 grid grid-cols-2 gap-2.5">
+              <li class="rounded-2xl bg-white/10 px-3.5 py-3">
+                <div class="text-[11px] uppercase tracking-wider text-white/60">Where</div>
+                <div class="mt-0.5 text-[14px] font-bold truncate">{{ trip.destination || '—' }}</div>
+              </li>
+              <li class="rounded-2xl bg-white/10 px-3.5 py-3">
+                <div class="text-[11px] uppercase tracking-wider text-white/60">When</div>
+                <div class="mt-0.5 text-[14px] font-bold tnum truncate">
+                  {{ trip.startDate && trip.endDate ? formatTripRange(trip.startDate, trip.endDate) : '—' }}
+                </div>
+              </li>
+              <li class="rounded-2xl bg-white/10 px-3.5 py-3">
+                <div class="text-[11px] uppercase tracking-wider text-white/60">Crew</div>
+                <div class="mt-0.5 text-[14px] font-bold">
+                  {{ trip.members.length ? `${trip.members.length} traveler${trip.members.length > 1 ? 's' : ''}` : '—' }}
+                </div>
+              </li>
+              <li class="rounded-2xl bg-white/10 px-3.5 py-3">
+                <div class="text-[11px] uppercase tracking-wider text-white/60">Budget</div>
+                <div class="mt-0.5 text-[14px] font-bold tnum truncate">
+                  {{ trip.budget.total > 0 ? formatCurrency(trip.budget.total, trip.budget.currency) : '—' }}
+                </div>
+              </li>
+            </ul>
+            <p v-else class="mt-3 text-[14px] text-white/75 leading-relaxed">
+              Ready when you are — pick a destination and your plan starts filling in here.
+            </p>
           </div>
         </div>
       </div>
+
+      <!-- Photo credit for licensed remote photos -->
+      <a
+        v-if="heroCredit"
+        :href="heroCredit.source"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="absolute bottom-3 right-4 text-[10.5px] text-white/55 hover:text-white/90 transition-colors"
+      >
+        Photo: {{ heroCredit.author }} · {{ heroCredit.license }}
+      </a>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { Trip } from '../types/trip'
 import { formatTripRange } from '../utils/dates'
 import { formatCurrency } from '../utils/currency'
-import Emoji3D from './Emoji3D.vue'
+import { findDestination } from '../data/destinations'
+import defaultHero from '../assets/images/place/angkor-wat.webp'
 import Icon from './icons/Icon.vue'
 
 const props = defineProps<{
@@ -153,5 +148,18 @@ const hasAnyDetails = computed(
     (!!props.trip.startDate && !!props.trip.endDate) ||
     props.trip.members.length > 0 ||
     props.trip.budget.total > 0
+)
+
+// The hero shows the chosen destination's photo; Angkor Wat until one is picked
+// or if a remote photo fails to load.
+const failedImage = ref('')
+const dest = computed(() => findDestination(props.trip.destination))
+const usingDestPhoto = computed(() => !!dest.value?.image && dest.value.image !== failedImage.value)
+const heroImage = computed(() => (usingDestPhoto.value ? dest.value!.image! : defaultHero))
+const heroCredit = computed(() => (usingDestPhoto.value ? dest.value?.imageCredit : undefined))
+const heroCaption = computed(() =>
+  usingDestPhoto.value && dest.value
+    ? `${dest.value.name} · ${dest.value.tagline ?? dest.value.region}`
+    : 'Angkor Wat · Siem Reap'
 )
 </script>

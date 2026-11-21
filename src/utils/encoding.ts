@@ -1,7 +1,12 @@
 import type { Trip } from '../types/trip'
+import { sanitizeTrip } from './tripSchema'
+
+// Share links over this size are rejected before decoding (defence against
+// pathological URLs; a realistic 10-day, 10-traveler trip is ~5-10 KB).
+const MAX_ENCODED_LENGTH = 200_000
 
 // Compress JSON data to make URL shorter
-const compressData = (data: any): string => {
+const compressData = (data: unknown): string => {
   try {
     const jsonString = JSON.stringify(data)
     // Encode as UTF-8 first so emoji/non-Latin chars survive base64
@@ -18,8 +23,9 @@ const compressData = (data: any): string => {
 }
 
 // Decompress JSON data from URL
-const decompressData = (compressed: string): any => {
+const decompressData = (compressed: string): unknown => {
   try {
+    if (compressed.length > MAX_ENCODED_LENGTH) return null
     // Convert back from URL-safe base64
     const base64 = compressed.replace(/-/g, '+').replace(/_/g, '/')
     // Add padding if needed
@@ -39,44 +45,34 @@ export const encodeTripToUrl = (trip: Trip): string => {
   return compressed
 }
 
+// Decode + sanitize. Returns null when the link is not a usable trip.
 export const decodeTripFromUrl = (encoded: string): Trip | null => {
   const data = decompressData(encoded)
-  if (!data) return null
-  
-  // Validate the decoded data
-  if (!validateTripData(data)) {
-    return null
-  }
-  
-  return data as Trip
-}
-
-const validateTripData = (data: any): boolean => {
-  // Basic shape validation (values may be empty — trips can be shared partially built)
-  if (!data || typeof data !== 'object') return false
-  if (typeof data.tripName !== 'string') return false
-  if (typeof data.destination !== 'string') return false
-  if (typeof data.startDate !== 'string') return false
-  if (typeof data.endDate !== 'string') return false
-  if (!Array.isArray(data.members)) return false
-  if (!data.transportation || typeof data.transportation !== 'object') return false
-  if (!data.accommodation || typeof data.accommodation !== 'object') return false
-  if (!data.budget || typeof data.budget !== 'object') return false
-  if (!Array.isArray(data.itinerary)) return false
-
-  return true
+  if (data == null) return null
+  return sanitizeTrip(data)
 }
 
 export const generateTripUrl = (trip: Trip, baseUrl: string = window.location.origin): string => {
   const encoded = encodeTripToUrl(trip)
+  if (!encoded) throw new Error('Could not encode trip for sharing')
   return `${baseUrl}/?trip=${encoded}`
 }
 
+export type UrlTripResult =
+  | { status: 'none' }
+  | { status: 'invalid' }
+  | { status: 'loaded'; trip: Trip }
+
+// Distinguishes "no shared trip in the URL" from "a broken link" so the UI
+// can tell the user instead of silently showing an empty planner.
+export const readTripFromUrl = (search: string = window.location.search): UrlTripResult => {
+  const encodedTrip = new URLSearchParams(search).get('trip')
+  if (!encodedTrip) return { status: 'none' }
+  const trip = decodeTripFromUrl(encodedTrip)
+  return trip ? { status: 'loaded', trip } : { status: 'invalid' }
+}
+
 export const extractTripFromUrl = (): Trip | null => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const encodedTrip = urlParams.get('trip')
-  
-  if (!encodedTrip) return null
-  
-  return decodeTripFromUrl(encodedTrip)
+  const result = readTripFromUrl()
+  return result.status === 'loaded' ? result.trip : null
 }

@@ -1,180 +1,240 @@
+// Suggested activities per destination. Only the first 6 are shown in the UI,
+// so each list starts with the must-sees. Content is based on
+// docs/Cambodia-destination.md (checked November 2026) — review it before each
+// travel season, as opening times, fees and access change.
 export const ACTIVITY_SUGGESTIONS: Record<string, string[]> = {
   'Siem Reap': [
-    'Angkor Wat',
-    'Bayon Temple',
+    'Angkor Wat Sunrise',
+    'Angkor Thom & Bayon',
     'Ta Prohm',
-    'Pub Street',
-    'Old Market',
-    'Tonlé Sap',
-    'Kulen Mountain',
     'Banteay Srei',
-    'Angkor Thom',
-    'Phare Circus'
-  ],
-  'Phnom Penh': [
-    'Royal Palace',
-    'National Museum',
-    'Wat Phnom',
-    'Central Market',
-    'Riverside',
-    'Tuol Sleng Museum',
-    'Killing Fields',
-    'Russian Market',
-    'Diamond Island',
-    'Independence Monument'
-  ],
-  'Kampot': [
-    'Bokor Mountain',
-    'Kampot River',
-    'Pepper Farm',
-    'Salt Fields',
-    'Secret Lake',
-    'Rabbit Island',
-    'Old Colonial Buildings',
-    'Kampot Market',
-    'Tek Chhou Rapids',
-    'Cave Temple'
-  ],
-  'Kep': [
-    'Kep Beach',
-    'Crab Market',
-    'Kep National Park',
-    'Rabbit Island',
-    'Crab Statue',
-    'Seafood Market',
-    'Veranda Natural Resort',
-    'Sunset Point',
-    'Jungle Trekking',
-    'Snorkeling'
-  ],
-  'Battambang': [
-    'Bamboo Train',
-    'Phnom Sampov',
-    'Battambang City',
-    'Killing Caves',
-    'Wat Banan',
-    'French Colonial Architecture',
-    'Battambang Museum',
-    'Phnom Sampeau',
-    'Ek Phnom Temple',
-    'Local Markets'
-  ],
-  'Mondulkiri': [
-    'Bou Sra Waterfall',
-    'Sen Monorom',
-    'Forest areas',
-    'Elephant Sanctuary',
-    'Waterfall Trekking',
-    'Indigenous Villages',
-    'Chrey ROM Waterfall',
-    'Monorom Waterfall',
-    'Nature Walks',
-    'Wildlife Viewing'
+    'Pub Street & Night Market',
+    'Phare Circus',
+    'Kampong Phluk Floating Village',
+    'Phnom Kulen',
+    'Angkor National Museum',
+    'Khmer Cooking Class'
   ],
   'Angkor Wat': [
     'Sunrise at Angkor Wat',
-    'Bayon Temple',
+    'Angkor Thom & Bayon',
     'Ta Prohm',
-    'Angkor Thom',
     'Banteay Srei',
     'Preah Khan',
     'Neak Pean',
     'Ta Som',
-    'East Mebon',
-    'Pre Rup'
+    'Roluos Group',
+    'Kbal Spean',
+    'Pre Rup Sunset'
+  ],
+  'Phnom Penh': [
+    'Royal Palace & Silver Pagoda',
+    'National Museum',
+    'Tuol Sleng Genocide Museum',
+    'Choeung Ek Memorial',
+    'Sisowath Quay Sunset Cruise',
+    'Russian Market',
+    'Wat Phnom',
+    'Central Market',
+    'Koh Dach (Silk Island)',
+    'Independence Monument'
+  ],
+  'Kampot': [
+    'Pepper Farm Tour',
+    'Bokor National Park',
+    'Sunset River Cruise',
+    'Salt Fields',
+    'Kampong Trach Caves',
+    'Night Market',
+    'Old Colonial Buildings',
+    'Secret Lake',
+    'Tek Chhou Rapids',
+    'Kep Crab Market'
+  ],
+  'Kep': [
+    'Crab Market',
+    'Koh Tonsay (Rabbit Island)',
+    'Kep National Park',
+    'Kep Beach',
+    'Sunset Point',
+    'Crab Statue',
+    'Pepper Farm Tour',
+    'Seafood Dinner',
+    'Jungle Trekking',
+    'Snorkeling'
   ],
   'Koh Rong': [
-    'Beach Relaxation',
-    'Snorkeling',
-    'Bioluminescent Plankton',
-    'Long Beach',
-    'Koh Tuich Village',
+    'Long Set Beach',
+    'Sok San Beach',
+    'Bioluminescent Plankton Swim',
+    'Koh Touch Village',
     'Jungle Trekking',
-    'Fishing Tours',
-    'Sunset Boat Tours',
+    'Snorkeling',
+    'Sunset Boat Tour',
     'Scuba Diving',
-    'Beach Parties'
+    'Fishing Tour',
+    'Beach Relaxation'
   ],
   'Koh Rong Sanloem': [
-    'Lazy Beach',
     'Saracen Bay',
+    'Lazy Beach',
+    "M'Pai Bay",
     'Snorkeling',
-    'Jungle Trekking',
-    'Sunset Beach',
     'Scuba Diving',
+    'Bioluminescent Plankton Swim',
     'Kayaking',
-    'Fishing Tours',
-    'Bioluminescent Plankton',
+    'Sunset Beach',
+    'Jungle Trekking',
     'Beach Relaxation'
   ],
   'Sihanoukville': [
+    'Ferry to Koh Rong',
+    'Ferry to Koh Rong Sanloem',
     'Otres Beach',
-    'Serendipity Beach',
-    'Kampong Som Bay',
-    'Kbal Chhay Waterfall',
     'Ream National Park',
-    'Water Sports',
+    'Kbal Chhay Waterfall',
+    'Serendipity Beach',
     'Island Hopping',
-    'Sunset Cruises',
-    'Night Markets',
+    'Sunset Cruise',
+    'Night Market',
     'Local Restaurants'
   ],
+  'Battambang': [
+    'Bamboo Train',
+    'Phnom Sampov & Killing Caves',
+    'Bat Cave at Sunset',
+    'Phare Ponleu Selpak Circus',
+    'Wat Banan',
+    'Colonial Old Town & Street 2.5',
+    'Wat Ko Wooden Houses',
+    'Countryside Cycling',
+    'Ek Phnom Temple',
+    'Battambang Museum'
+  ],
+  'Mondulkiri': [
+    'Elephant Valley Project',
+    'The Mondulkiri Project',
+    'Bou Sra Waterfall',
+    'Sen Monorom',
+    'Bunong Villages',
+    'Coffee Farms',
+    'Grassland Hills',
+    'Monorom Waterfall',
+    'Waterfall Trekking',
+    'Wildlife Viewing'
+  ],
   'Ratanakiri': [
-    'Yeak Laom Volcanic Lake',
-    'Virachey National Park',
-    'Gem Mines',
-    'Waterfalls',
+    'Yeak Laom Crater Lake',
+    'Ka Tieng Waterfall',
+    'Cha Ong Waterfall',
+    'Virachey National Park Trek',
+    'River Trip',
     'Indigenous Villages',
     'Jungle Trekking',
-    'Wildlife Viewing',
-    'Cha Ong Waterfall',
-    'Katieng Waterfall',
-    'Lumphat Wildlife Sanctuary'
+    'Gem Mines',
+    'Lumphat Wildlife Sanctuary',
+    'Wildlife Viewing'
   ],
   'Koh Kong': [
-    'Cardamom Mountains',
-    'Tatai Waterfall',
     'Chi Phat Community',
-    'Tang Kay',
-    'Peam Krasaop',
-    'Mangrove Forests',
+    'Tatai Waterfall',
+    'Mangrove Kayaking',
+    'Peam Krasaop Mangroves',
+    'Cardamom Mountains',
+    'Tatai River Eco-lodge',
     'Jungle Trekking',
-    'Kayaking',
+    'Tang Kay',
     'Wildlife Viewing',
     'Eco-Tourism'
   ],
   'Bokor': [
-    'Bokor Hill Station',
-    'Old Casino',
+    'Bokor Hill Station Ruins',
+    'Lok Yeay Mao Statue',
     'Popokvil Waterfall',
-    'Thansur Sokha Hotel',
-    'Jungle Trekking',
+    'Old Casino',
+    'Scenic Viewpoints',
     'Cloud Forest',
     'Historic Buildings',
-    'Scenic Viewpoints',
+    'Jungle Trekking',
     'Wildlife Viewing',
     'Nature Photography'
   ],
   'Kulen Mountain': [
-    'River of Thousand Lingas',
-    'Waterfall',
-    'Pagoda',
+    'River of a Thousand Lingas',
+    'Kulen Waterfall Swim',
     'Reclining Buddha',
-    'Jungle Trekking',
+    'Preah Ang Thom Pagoda',
     'Natural Pools',
     'Sacred Sites',
+    'Jungle Trekking',
     'Viewpoints',
     'Wildlife Viewing',
     'Nature Photography'
+  ],
+  'Tonle Sap': [
+    'Kampong Phluk Stilt Village',
+    'Kampong Khleang Village',
+    'Chong Kneas Floating Village',
+    'Sunset Boat Trip',
+    'Flooded Forest by Canoe',
+    'Local Fish Market'
+  ],
+  'Beng Mealea': [
+    'Beng Mealea Jungle Temple',
+    'Koh Ker Day Trip',
+    'Temple Photography',
+    'Countryside Drive'
+  ],
+  'Koh Ker': [
+    'Prasat Thom Pyramid',
+    'Prasat Krahom',
+    'Beng Mealea Stop',
+    'Lingapura Temple Walk',
+    'Temple Photography'
+  ],
+  'Sambor Prei Kuk': [
+    'Prasat Sambor Temples',
+    'Prasat Tao (Lion Temple)',
+    'Prasat Yeai Poeun',
+    'Kampong Thom Town',
+    'Temple Photography'
+  ],
+  'Kratie': [
+    'Irrawaddy Dolphins at Kampi',
+    'Koh Trong Island Cycling',
+    'Mekong Sunset',
+    'Riverside Market',
+    'Phnom Sambok Pagoda'
+  ],
+  'Chi Phat': [
+    'Community Homestay',
+    'Jungle Trekking',
+    'Mountain Biking',
+    'River Trip',
+    'Waterfall Hike',
+    'Wildlife Spotting'
   ]
 }
 
+// Exact (case-insensitive) match first, then the longest key contained in the
+// typed text ("Day in Koh Rong Sanloem" -> "Koh Rong Sanloem", not "Koh Rong").
+// Previously the first partial match won in either direction, so
+// "Koh Rong Sanloem" got Koh Rong's list and an empty destination matched
+// Siem Reap.
 export const getSuggestionsForDestination = (destination: string): string[] => {
-  // Find matching destination (case-insensitive, partial match)
-  const matchingKey = Object.keys(ACTIVITY_SUGGESTIONS).find(key => 
-    destination.toLowerCase().includes(key.toLowerCase()) || 
-    key.toLowerCase().includes(destination.toLowerCase())
-  )
-  
-  return matchingKey ? ACTIVITY_SUGGESTIONS[matchingKey] : []
+  const query = destination.trim().toLowerCase()
+  if (query.length < 3) return []
+
+  const keys = Object.keys(ACTIVITY_SUGGESTIONS)
+  const exact = keys.find(key => key.toLowerCase() === query)
+  if (exact) return ACTIVITY_SUGGESTIONS[exact]
+
+  const contained = keys
+    .filter(key => query.includes(key.toLowerCase()))
+    .sort((a, b) => b.length - a.length)[0]
+  if (contained) return ACTIVITY_SUGGESTIONS[contained]
+
+  // Partially typed name ("Angkor" -> "Angkor Wat").
+  const prefix = query.length >= 4 ? keys.find(key => key.toLowerCase().startsWith(query)) : undefined
+  return prefix ? ACTIVITY_SUGGESTIONS[prefix] : []
 }

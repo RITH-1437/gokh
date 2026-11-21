@@ -1,7 +1,17 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import type { Trip, Member, Currency } from '../types/trip'
-import { extractTripFromUrl } from '../utils/encoding'
-import { generateDateRange } from '../utils/dates'
+import { readTripFromUrl } from '../utils/encoding'
+import { generateDateRange, isValidDateRange, daysBetweenInclusive, MAX_TRIP_DAYS } from '../utils/dates'
+import { convertCurrency } from '../utils/currency'
+import { createId } from '../utils/id'
+import { loadSavedTrip, saveTrip, clearSavedTrip } from '../utils/storage'
+
+export type TripLoadStatus = 'loaded' | 'invalid' | 'none'
+
+export interface UseTripOptions {
+  /** Persist the trip to localStorage and allow restoring it on reload. */
+  persist?: boolean
+}
 
 const createEmptyTrip = (): Trip => ({
   tripName: '',
@@ -22,10 +32,21 @@ const createEmptyTrip = (): Trip => ({
     currency: 'USD',
     contributions: []
   },
-  itinerary: []
+  itinerary: [],
+  checklist: []
 })
 
-export const useTrip = () => {
+// True when nothing meaningful has been entered yet.
+export const isTripEmpty = (t: Trip): boolean =>
+  !t.tripName.trim() &&
+  !t.destination.trim() &&
+  t.members.length === 0 &&
+  !t.startDate &&
+  !t.endDate &&
+  t.budget.total <= 0 &&
+  t.itinerary.every(d => d.activities.length === 0)
+
+export const useTrip = (options: UseTripOptions = {}) => {
   const trip = ref<Trip>(createEmptyTrip())
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -33,23 +54,54 @@ export const useTrip = () => {
   const hasUnsavedEdits = ref(false)
   let suppressEditTrack = false
 
-  // Load trip from URL on mount
-  const loadTripFromUrl = async () => {
+  // Replace the whole trip without counting it as a user edit.
+  const replaceTrip = async (next: Trip) => {
+    suppressEditTrack = true
+    trip.value = next
+    await nextTick()
+    suppressEditTrack = false
+  }
+
+  // Load a shared trip from `?trip=`. Resolves to 'invalid' for a broken or
+  // tampered link (the param is removed either way so a refresh is clean).
+  const loadTripFromUrl = async (): Promise<TripLoadStatus> => {
     try {
-      const urlTrip = extractTripFromUrl()
-      if (urlTrip) {
-        suppressEditTrack = true
-        trip.value = urlTrip
-        loadedFromUrl.value = true
-        // Update URL without the trip parameter
-        window.history.replaceState({}, '', window.location.pathname)
-        await nextTick()
-        suppressEditTrack = false
+      const result = readTripFromUrl()
+      if (result.status === 'none') return 'none'
+      window.history.replaceState({}, '', window.location.pathname)
+      if (result.status === 'invalid') {
+        error.value = 'This share link is broken or incomplete'
+        return 'invalid'
       }
+      loadedFromUrl.value = true
+      await replaceTrip(result.trip)
+      return 'loaded'
     } catch (err) {
       error.value = 'Failed to load trip from URL'
       console.error(err)
+      return 'invalid'
     }
+  }
+
+  // Restore the locally saved draft (if persistence is enabled).
+  const restoreSavedTrip = async (): Promise<boolean> => {
+    if (!options.persist) return false
+    const saved = loadSavedTrip()
+    if (!saved || isTripEmpty(saved)) return false
+    await replaceTrip(saved)
+    return true
+  }
+
+  if (options.persist) {
+    let saveTimer: ReturnType<typeof setTimeout> | undefined
+    watch(
+      trip,
+      value => {
+        clearTimeout(saveTimer)
+        saveTimer = setTimeout(() => saveTrip(value), 250)
+      },
+      { deep: true }
+    )
   }
 
   const clearSharedTripFlag = () => {
@@ -68,21 +120,21 @@ export const useTrip = () => {
     { deep: true }
   )
 
-  // Generate itinerary dates when dates change
+  // Generate itinerary dates when dates change. An invalid or oversized range
+  // leaves the itinerary untouched — previously an end date before the start
+  // date produced an empty range and silently deleted every planned activity.
   const updateItineraryDates = () => {
-    if (trip.value.startDate && trip.value.endDate) {
-      const dateRange = generateDateRange(trip.value.startDate, trip.value.endDate)
-      
-      // Adjust existing itinerary to match new date range
-      const updatedItinerary = dateRange.map((date, index) => {
-        const existingDay = trip.value.itinerary[index]
-        return existingDay
-          ? { ...existingDay, dayNumber: index + 1, date }
-          : { dayNumber: index + 1, date, activities: [] }
-      })
-      
-      trip.value.itinerary = updatedItinerary
-    }
+    const { startDate, endDate } = trip.value
+    if (!isValidDateRange(startDate, endDate)) return
+    if (daysBetweenInclusive(startDate, endDate) > MAX_TRIP_DAYS) return
+
+    // Day N keeps its activities; days beyond the new range are dropped.
+    trip.value.itinerary = generateDateRange(startDate, endDate).map((date, index) => {
+      const existingDay = trip.value.itinerary[index]
+      return existingDay
+        ? { ...existingDay, dayNumber: index + 1, date }
+        : { dayNumber: index + 1, date, activities: [] }
+    })
   }
 
   // Watch for date changes
@@ -96,7 +148,7 @@ export const useTrip = () => {
   // Member management
   const addMember = (name: string, role: 'leader' | 'member' = 'member') => {
     const newMember: Member = {
-      id: Date.now().toString(),
+      id: createId(),
       name,
       role
     }
@@ -154,14 +206,11 @@ export const useTrip = () => {
 
   // Budget calculations
   const totalContributed = computed(() => {
-    return trip.value.budget.contributions.reduce((sum, contribution) => {
-      // Convert to budget currency if needed
-      if (contribution.currency === trip.value.budget.currency) {
-        return sum + contribution.amount
-      }
-      // Simple conversion - in real app would use currency utility
-      return sum + contribution.amount
-    }, 0)
+    const target = trip.value.budget.currency
+    return trip.value.budget.contributions.reduce(
+      (sum, c) => sum + convertCurrency(c.amount, c.currency, target),
+      0
+    )
   })
 
   const remainingBudget = computed(() => {
@@ -195,6 +244,8 @@ export const useTrip = () => {
       c => c.memberId === memberId
     )
     
+    // Negative or non-numeric amounts are never stored.
+    amount = Number.isFinite(amount) && amount > 0 ? amount : 0
     if (existingIndex >= 0) {
       trip.value.budget.contributions[existingIndex] = { memberId, amount, currency }
     } else {
@@ -206,9 +257,18 @@ export const useTrip = () => {
     return trip.value.budget.contributions.find(c => c.memberId === memberId)
   }
 
+  // Shared pre-trip checklist
+  const toggleChecklistItem = (id: string) => {
+    const done = trip.value.checklist ?? []
+    trip.value.checklist = done.includes(id) ? done.filter(x => x !== id) : [...done, id]
+  }
+
   // Reset trip
   const resetTrip = () => {
     trip.value = createEmptyTrip()
+    loadedFromUrl.value = false
+    hasUnsavedEdits.value = false
+    if (options.persist) clearSavedTrip()
   }
 
   // Export trip for sharing
@@ -228,6 +288,7 @@ export const useTrip = () => {
     loadedFromUrl,
     hasUnsavedEdits,
     loadTripFromUrl,
+    restoreSavedTrip,
     clearSharedTripFlag,
     addMember,
     removeMember,
@@ -241,6 +302,7 @@ export const useTrip = () => {
     perPersonBudget,
     updateContribution,
     getContributionForMember,
+    toggleChecklistItem,
     resetTrip,
     exportTrip,
     importTrip

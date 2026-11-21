@@ -69,9 +69,9 @@ import { ref, watch } from 'vue'
 import type { Transportation, TransportationType } from '../types/trip'
 import Icon from './icons/Icon.vue'
 
-import motorImg from '../assets/images/vehicle/motor-honda.png'
-import vanImg from '../assets/images/vehicle/van.png'
-import busImg from '../assets/images/vehicle/bus.png'
+import motorImg from '../assets/images/vehicle/motor-honda.webp'
+import vanImg from '../assets/images/vehicle/van.webp'
+import busImg from '../assets/images/vehicle/bus.webp'
 
 const props = defineProps<{
   modelValue: Transportation

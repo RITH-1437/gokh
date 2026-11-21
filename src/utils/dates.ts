@@ -93,3 +93,23 @@ export const todayISO = (): string => {
   const now = new Date()
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
+
+// Upper bound on trip length. Keeps the itinerary renderable and prevents a
+// typo (or a crafted share link) like "2099-01-01" from generating tens of
+// thousands of itinerary days and freezing the page.
+export const MAX_TRIP_DAYS = 90
+
+// True only for real calendar dates in strict YYYY-MM-DD form
+// (rejects "2026-02-30", "2026-2-1", "", etc.).
+export const isValidISODate = (date: unknown): date is string => {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false
+  const [y, m, d] = date.split('-').map(Number)
+  const parsed = new Date(y, m - 1, d)
+  return parsed.getFullYear() === y && parsed.getMonth() === m - 1 && parsed.getDate() === d
+}
+
+// Inclusive day count between two ISO dates (1 for a same-day trip).
+export const daysBetweenInclusive = (startDate: string, endDate: string): number => {
+  const ms = parseISODate(endDate).getTime() - parseISODate(startDate).getTime()
+  return Math.round(ms / 86_400_000) + 1
+}

@@ -3,11 +3,13 @@
     <!-- Header band -->
     <div class="relative bg-gradient-to-br from-cambodia-700 via-cambodia-800 to-cambodia-900 px-5 sm:px-6 pt-5 pb-5 text-white overflow-hidden">
       <img
-        v-if="destImage"
+        v-if="destImage && !imageFailed"
         :src="destImage"
-        :alt="trip.destination"
+        alt=""
         loading="lazy"
+        decoding="async"
         class="absolute inset-0 h-full w-full object-cover opacity-45"
+        @error="imageFailed = true"
       />
       <div class="absolute inset-0 bg-gradient-to-br from-cambodia-800/80 via-cambodia-800/60 to-cambodia-900/90" />
       <div class="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20" style="background: radial-gradient(closest-side, #E2BD76, transparent)" />
@@ -168,6 +170,9 @@ const duration = computed(() => {
 })
 
 const destImage = computed(() => findDestination(props.trip.destination)?.image)
+// Remote (Wikimedia) photos can fail or be rate-limited; fall back to the plain band.
+const imageFailed = ref(false)
+watch(destImage, () => { imageFailed.value = false })
 
 const transport = computed(() => {
   const map: Record<string, { label: string; emoji: string }> = {

@@ -1,4 +1,6 @@
 import type { Trip, Member } from '../types/trip'
+import { parseISODate, isValidISODate, MAX_TRIP_DAYS } from './dates'
+import { convertCurrency } from './currency'
 
 export interface ValidationResult {
   isValid: boolean
@@ -24,8 +26,8 @@ export const validateTrip = (trip: Trip): ValidationResult => {
   if (!trip.startDate || !trip.endDate) {
     errors.push('Please select start and end dates')
   } else {
-    const start = new Date(trip.startDate)
-    const end = new Date(trip.endDate)
+    const start = parseISODate(trip.startDate)
+    const end = parseISODate(trip.endDate)
     if (end < start) {
       errors.push('End date cannot be before start date')
     }
@@ -55,7 +57,10 @@ export const validateTrip = (trip: Trip): ValidationResult => {
   if (trip.budget.total <= 0) {
     warnings.push('Set a budget to track expenses')
   } else if (trip.members.length > 0) {
-    const totalContributed = trip.budget.contributions.reduce((sum, c) => sum + c.amount, 0)
+    const totalContributed = trip.budget.contributions.reduce(
+      (sum, c) => sum + convertCurrency(c.amount, c.currency, trip.budget.currency),
+      0
+    )
     if (totalContributed === 0) {
       warnings.push('Add budget contributions from travelers')
     } else if (totalContributed < trip.budget.total) {
@@ -110,7 +115,9 @@ export const validateBudget = (amount: number, currency: string): ValidationResu
   const warnings: string[] = []
   const errors: string[] = []
 
-  if (amount <= 0) {
+  if (amount < 0) {
+    errors.push('Budget cannot be negative')
+  } else if (amount === 0) {
     errors.push('Budget must be greater than 0')
   }
 
@@ -161,21 +168,23 @@ export const validateDateRange = (startDate: string, endDate: string): Validatio
     return { isValid: false, warnings, errors }
   }
 
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+  if (!isValidISODate(startDate) || !isValidISODate(endDate)) {
     errors.push('Invalid date format')
     return { isValid: false, warnings, errors }
   }
+
+  const start = parseISODate(startDate)
+  const end = parseISODate(endDate)
 
   if (end < start) {
     errors.push('End date cannot be before start date')
   }
 
-  const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-  
-  if (diffDays > 30) {
+  const diffDays = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (diffDays + 1 > MAX_TRIP_DAYS) {
+    errors.push(`Trips can be up to ${MAX_TRIP_DAYS} days long`)
+  } else if (diffDays > 30) {
     warnings.push('Trip duration is quite long (over 30 days)')
   }
 

@@ -69,9 +69,9 @@ import { ref, watch } from 'vue'
 import type { Accommodation, AccommodationType } from '../types/trip'
 import Icon from './icons/Icon.vue'
 
-import hotelImg from '../assets/images/sleep/hotel.png'
-import guesthouseImg from '../assets/images/sleep/guest-house.png'
-import campingImg from '../assets/images/sleep/camping.png'
+import hotelImg from '../assets/images/sleep/hotel.webp'
+import guesthouseImg from '../assets/images/sleep/guest-house.webp'
+import campingImg from '../assets/images/sleep/camping.webp'
 
 const props = defineProps<{
   modelValue: Accommodation

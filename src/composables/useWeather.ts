@@ -1,81 +1,99 @@
 import { ref } from 'vue'
 import type { WeatherDay } from '../types/trip'
-import { CAMBODIAN_DESTINATIONS } from '../data/destinations'
+import { findDestination } from '../data/destinations'
+import { parseISODate } from '../utils/dates'
+
+export const WEATHER_MESSAGES = {
+  tooFar: 'Forecasts are available for trips within 14 days of today — check back closer to your dates. The trip plan keeps working fine.',
+  unknownPlace: 'Live forecasts are available for featured destinations. Your plan keeps working fine without one.',
+  unavailable: "We couldn't load the forecast right now. Your plan keeps working fine — try again later."
+} as const
+
+const FORECAST_DAYS = 14
 
 export const useWeather = () => {
   const weather = ref<WeatherDay[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  // Each fetch gets a sequence number; only the latest one may write state,
+  // so quickly changing dates can't show the forecast for an older range.
+  let requestSeq = 0
+  let controller: AbortController | null = null
 
-  const getCoordinatesForDestination = (destination: string): { lat: number; lon: number } | null => {
-    // Find matching destination
-    const matchedDest = CAMBODIAN_DESTINATIONS.find(
-      dest => dest.name.toLowerCase() === destination.toLowerCase()
-    )
-    
-    if (matchedDest?.coordinates) {
-      return matchedDest.coordinates
-    }
-    
-    // Default to Siem Reap if no match found
-    const defaultDest = CAMBODIAN_DESTINATIONS.find(d => d.name === 'Siem Reap')
-    return defaultDest?.coordinates || null
+  // Only featured destinations have coordinates. Unknown (custom) places no
+  // longer fall back to Siem Reap, which showed weather for the wrong city.
+  const getCoordinatesForDestination = (destination: string) =>
+    findDestination(destination)?.coordinates ?? null
+
+  const clear = () => {
+    requestSeq++
+    controller?.abort()
+    weather.value = []
+    error.value = null
+    isLoading.value = false
   }
 
   const fetchWeather = async (destination: string, startDate: string, endDate: string): Promise<void> => {
-    isLoading.value = true
+    const seq = ++requestSeq
+    controller?.abort()
+    controller = typeof AbortController !== 'undefined' ? new AbortController() : null
+    const isCurrent = () => seq === requestSeq
+
+    weather.value = []
     error.value = null
-    
+
+    const coordinates = getCoordinatesForDestination(destination)
+    if (!coordinates) {
+      error.value = WEATHER_MESSAGES.unknownPlace
+      isLoading.value = false
+      return
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const maxDate = new Date(today)
+    maxDate.setDate(today.getDate() + FORECAST_DAYS)
+    if (parseISODate(startDate) > maxDate || parseISODate(endDate) > maxDate || parseISODate(endDate) < today) {
+      error.value = WEATHER_MESSAGES.tooFar
+      isLoading.value = false
+      return
+    }
+
+    isLoading.value = true
     try {
-      const coordinates = getCoordinatesForDestination(destination)
-      if (!coordinates) {
-        throw new Error('Could not find coordinates for destination')
-      }
-
-      // Check if dates are within API range (Open-Meteo typically supports ~14 days forecast)
-      const start = new Date(startDate)
-      const end = new Date(endDate)
-      const now = new Date()
-      const maxDate = new Date()
-      maxDate.setDate(now.getDate() + 14) // 14 days from now
-      
-      if (start > maxDate || end > maxDate) {
-        // Dates are too far in the future for weather API
-        weather.value = []
-        error.value = 'Weather forecast only available for dates within 14 days'
-        return
-      }
-
       // Open-Meteo API (free, no API key required)
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${coordinates.lat}&longitude=${coordinates.lon}&daily=temperature_2m_max,precipitation_probability_max,weathercode&timezone=auto&start_date=${startDate}&end_date=${endDate}`
-      
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error('Weather API request failed')
-      }
-      
+      const params = new URLSearchParams({
+        latitude: String(coordinates.lat),
+        longitude: String(coordinates.lon),
+        daily: 'temperature_2m_max,precipitation_probability_max,weathercode',
+        timezone: 'auto',
+        start_date: startDate,
+        end_date: endDate
+      })
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, {
+        signal: controller?.signal
+      })
+      if (!response.ok) throw new Error(`Weather API request failed (${response.status})`)
+
       const data = await response.json()
-      
-      // Check for API error response
-      if (data.error) {
-        throw new Error(data.reason || 'Weather API returned an error')
-      }
-      
-      // Parse the response
-      const weatherData: WeatherDay[] = data.daily.time.map((date: string, index: number) => ({
+      if (data?.error) throw new Error(data.reason || 'Weather API returned an error')
+      const daily = data?.daily
+      if (!daily || !Array.isArray(daily.time)) throw new Error('Unexpected weather response')
+
+      if (!isCurrent()) return
+      weather.value = daily.time.map((date: string, index: number) => ({
         date,
-        temperature: data.daily.temperature_2m_max[index],
-        weatherCode: data.daily.weathercode[index],
-        rainChance: data.daily.precipitation_probability_max[index] || 0
+        temperature: Number(daily.temperature_2m_max?.[index] ?? 0),
+        weatherCode: Number(daily.weathercode?.[index] ?? 0),
+        rainChance: Number(daily.precipitation_probability_max?.[index] ?? 0) || 0
       }))
-      
-      weather.value = weatherData
     } catch (err) {
-      error.value = 'Weather forecast unavailable for selected dates'
+      if (!isCurrent() || (err instanceof DOMException && err.name === 'AbortError')) return
+      error.value = WEATHER_MESSAGES.unavailable
       console.error('Weather fetch error:', err)
       weather.value = []
     } finally {
-      isLoading.value = false
+      if (isCurrent()) isLoading.value = false
     }
   }
 
@@ -105,6 +123,7 @@ export const useWeather = () => {
     isLoading,
     error,
     fetchWeather,
+    clear,
     getWeatherIcon,
     getWeatherDescription
   }

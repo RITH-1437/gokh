@@ -107,6 +107,10 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '.55' }
         },
+        'ken-burns': {
+          from: { transform: 'scale(1.0)' },
+          to: { transform: 'scale(1.08)' }
+        },
         'draw-line': {
           from: { transform: 'scaleY(0)' },
           to: { transform: 'scaleY(1)' }
@@ -123,6 +127,7 @@ export default {
         'slide-down': 'slide-down .28s cubic-bezier(.22,1,.36,1) both',
         'slide-up': 'slide-up .4s cubic-bezier(.22,1,.36,1) both',
         'pulse-soft': 'pulse-soft 2.6s ease-in-out infinite',
+        'ken-burns': 'ken-burns 18s ease-out both',
         'draw-line': 'draw-line .5s cubic-bezier(.22,1,.36,1) both'
       }
     }

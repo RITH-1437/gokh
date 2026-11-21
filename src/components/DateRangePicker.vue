@@ -78,6 +78,7 @@
       v-model="endDate"
       type="date"
       :min="startDate || minDate"
+      :max="maxEndDate"
       class="sr-only"
       aria-label="End date"
     />
@@ -106,7 +107,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { formatDateTile, calculateDuration, isValidDateRange, todayISO, parseISODate } from '../utils/dates'
+import { formatDateTile, calculateDuration, isValidDateRange, todayISO, parseISODate, MAX_TRIP_DAYS } from '../utils/dates'
 import { validateDateRange } from '../utils/validation'
 import WarningAlert from './WarningAlert.vue'
 import Icon from './icons/Icon.vue'
@@ -121,11 +122,35 @@ const emit = defineEmits<{
   'update:endDate': [value: string]
 }>()
 
-const startDate = ref(props.startDate)
-const endDate = ref(props.endDate)
+// The picker is fully controlled by its props. It previously copied props into
+// local refs once, so a trip loaded from a share link (or reset) never showed
+// up here, and picking one date re-emitted the other as an empty string.
+const startDate = computed({
+  get: () => props.startDate,
+  set: (value: string) => {
+    emit('update:startDate', value)
+    // Moving the start past the end clears the end so the range stays valid.
+    if (value && props.endDate && !isValidDateRange(value, props.endDate)) {
+      emit('update:endDate', '')
+    }
+  }
+})
+const endDate = computed({
+  get: () => props.endDate,
+  set: (value: string) => emit('update:endDate', value)
+})
 const errorMessage = ref('')
 const durationWarning = ref('')
 const minDate = todayISO()
+
+// Last selectable end date: start + MAX_TRIP_DAYS - 1.
+const maxEndDate = computed(() => {
+  if (!startDate.value) return undefined
+  const start = parseISODate(startDate.value)
+  const last = new Date(start.getFullYear(), start.getMonth(), start.getDate() + MAX_TRIP_DAYS - 1)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${last.getFullYear()}-${pad(last.getMonth() + 1)}-${pad(last.getDate())}`
+})
 
 const startInput = ref<HTMLInputElement>()
 const endInput = ref<HTMLInputElement>()
@@ -135,7 +160,7 @@ const endTile = computed(() => (endDate.value ? formatDateTile(endDate.value) : 
 
 const duration = computed(() => {
   if (!startDate.value || !endDate.value) return null
-  if (!isValidDateRange(startDate.value, endDate.value)) return null
+  if (validateDateRange(startDate.value, endDate.value).errors.length) return null
   return calculateDuration(startDate.value, endDate.value)
 })
 
@@ -168,7 +193,5 @@ watch([startDate, endDate], () => {
     errorMessage.value = ''
     durationWarning.value = ''
   }
-  emit('update:startDate', startDate.value)
-  emit('update:endDate', endDate.value)
 }, { immediate: true })
 </script>

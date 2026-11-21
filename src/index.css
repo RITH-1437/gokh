@@ -78,6 +78,14 @@
     @apply bg-white/90 border border-stone-200/80 rounded-3xl shadow-soft;
   }
 
+  /* Frosted glass over photography */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,.18)];
+  }
+  .glass-strong {
+    @apply bg-black/25 backdrop-blur-xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,.35)];
+  }
+
   .chip {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium
       bg-white border border-stone-200 text-ink-soft transition-all duration-200

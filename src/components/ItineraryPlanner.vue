@@ -5,7 +5,30 @@
       <Emoji3D emoji="🌤️" size="xs" />
       <div class="text-[13.5px] text-ink-soft leading-snug">
         <span class="font-bold text-ink">Weather preview.</span>
-        Forecasts are available for trips within 14 days of today — check back closer to your dates. The trip plan keeps working fine.
+        {{ weatherError }}
+      </div>
+    </div>
+
+    <!-- Route templates (only while nothing is planned yet) -->
+    <div v-if="itinerary.length > 0 && !anyActivities" class="surface !rounded-2xl p-4 sm:p-5 animate-fade-in">
+      <div class="flex items-center gap-2 mb-1">
+        <Icon name="route" :size="16" class="text-cambodia-700" />
+        <p class="font-bold text-ink text-[15px]">Start from a route</p>
+      </div>
+      <p class="text-[13px] text-ink-mute mb-3">
+        Fill your {{ itinerary.length }} day{{ itinerary.length > 1 ? 's' : '' }} with a tried-and-tested route — edit anything afterwards.
+      </p>
+      <div class="grid sm:grid-cols-3 gap-2">
+        <button
+          v-for="route in routes"
+          :key="route.id"
+          type="button"
+          class="text-left rounded-xl border border-stone-200 bg-white px-3.5 py-3 hover:border-cambodia-300 hover:shadow-soft transition-all duration-200 focus-ring active:scale-[.98]"
+          @click="emit('applyTemplate', route.id)"
+        >
+          <span class="block text-[14px] font-bold text-ink">{{ route.name }}</span>
+          <span class="block text-[12px] text-ink-mute mt-0.5">{{ route.summary }}</span>
+        </button>
       </div>
     </div>
 
@@ -16,7 +39,7 @@
       <p class="text-sm text-ink-mute mt-1 max-w-sm">
         Choose your dates to start building your itinerary.
       </p>
-      <button class="btn-primary mt-5" @click="emit('choose-dates')">
+      <button class="btn-primary mt-5" @click="emit('chooseDates')">
         Choose dates
         <Icon name="arrow-right" :size="16" />
       </button>
@@ -159,8 +182,13 @@
                 v-model="editForm.name"
                 type="text"
                 placeholder="Activity name"
+                aria-label="Activity name"
+                maxlength="120"
                 class="field !h-11"
+                @keyup.enter="saveEdit(dayIndex, actIndex)"
+                @keyup.esc="cancelEdit"
               />
+              <p v-if="editError" class="text-[13px] text-clay-600 animate-fade-in" role="alert">{{ editError }}</p>
               <div class="flex gap-2">
                 <input v-model="editForm.startTime" type="time" class="field !h-11 flex-1" />
                 <input v-model="editForm.endTime" type="time" class="field !h-11 flex-1" />
@@ -186,6 +214,8 @@
               v-model="draft.name"
               type="text"
               placeholder="What are you doing?"
+              aria-label="New activity name"
+              maxlength="120"
               class="field !h-11"
               autofocus
               @keyup.enter="saveDraft(dayIndex)"
@@ -251,6 +281,7 @@ import { ref, reactive, computed } from 'vue'
 import type { ItineraryDay, Activity, WeatherDay } from '../types/trip'
 import { formatDate, parseISODate } from '../utils/dates'
 import { getSuggestionsForDestination } from '../data/activities'
+import { ROUTE_TEMPLATES } from '../data/routes'
 import Emoji3D from './Emoji3D.vue'
 import Icon from './icons/Icon.vue'
 
@@ -275,7 +306,11 @@ const emit = defineEmits<{
   removeActivity: [dayIndex: number, actIndex: number]
   directions: [location: string]
   chooseDates: []
+  applyTemplate: [templateId: string]
 }>()
+
+const routes = ROUTE_TEMPLATES
+const anyActivities = computed(() => props.itinerary.some(d => d.activities.length > 0))
 
 const suggestions = computed(() => getSuggestionsForDestination(props.destination))
 
@@ -319,6 +354,7 @@ const weatherEmoji = (code: number): string => {
 // Edit state
 const editing = ref<{ day: number; act: number } | null>(null)
 const editForm = reactive({ name: '', startTime: '', endTime: '', description: '' })
+const editError = ref('')
 
 const isEditing = (dayIndex: number, actIndex: number) =>
   editing.value?.day === dayIndex && editing.value?.act === actIndex
@@ -330,20 +366,27 @@ const startEdit = (dayIndex: number, actIndex: number) => {
   editForm.startTime = activity.startTime || ''
   editForm.endTime = activity.endTime || ''
   editForm.description = activity.description || ''
+  editError.value = ''
   editing.value = { day: dayIndex, act: actIndex }
 }
 
 const saveEdit = (dayIndex: number, actIndex: number) => {
   if (!editing.value) return
-  emit('updateActivity', dayIndex, actIndex, 'name', editForm.name)
+  const name = editForm.name.trim()
+  if (!name) {
+    editError.value = 'An activity needs a name.'
+    return
+  }
+  emit('updateActivity', dayIndex, actIndex, 'name', name)
   emit('updateActivity', dayIndex, actIndex, 'startTime', editForm.startTime)
   emit('updateActivity', dayIndex, actIndex, 'endTime', editForm.endTime)
-  emit('updateActivity', dayIndex, actIndex, 'description', editForm.description)
+  emit('updateActivity', dayIndex, actIndex, 'description', editForm.description.trim())
   editing.value = null
 }
 
 const cancelEdit = () => {
   editing.value = null
+  editError.value = ''
 }
 
 // Draft state
