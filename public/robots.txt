@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block trip share links — they are user-generated and not useful to index
+Disallow: /?trip=
+
+Sitemap: https://gokh.vercel.app/sitemap.xml
