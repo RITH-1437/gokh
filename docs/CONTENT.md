@@ -52,7 +52,7 @@ fits the photo-card badge.
   length. Templates span several cities, so they don't change the trip's
   destination.
 
-## Destinations (20)
+## Destinations (26)
 
 | Destination | Region (app) | Stay | Best season | Advisory | Photo |
 | --- | --- | --- | --- | --- | --- |
@@ -76,13 +76,21 @@ fits the photo-card badge.
 | Sambor Prei Kuk | Northwest | ½–1 day | Nov–Mar | | |
 | Kratie | Northeast | 1–2 days | Dec–May | | Commons |
 | Chi Phat | Southwest | 2–3 days | Nov–Apr | | Commons |
+| Banteay Srei | Angkor | ½ day | Nov–Mar | | Commons |
+| Roluos Group | Angkor | ½ day | Nov–Mar | | Commons |
+| Koh Dach | Capital | ½ day | Nov–Mar | | Commons |
+| Koh Tonsay | South coast | 1 day | Nov–May | | Commons |
+| Tatai River | Southwest | 1–2 days | Nov–Apr | Thai border area | Commons |
+| Stung Treng | Northeast | 1–2 days | Dec–May | | Commons |
 
-The 7 destinations with bundled photos are the "Popular in Cambodia" cards; the
-others are reachable by typing their name. "Commons" photos are linked directly
+The 7 destinations with bundled photos are the "Popular in Cambodia" cards; all
+others are listed under "More places" (grouped by region) and can also be typed. "Commons" photos are linked directly
 from Wikimedia Commons with credits — see [IMAGE_CREDITS.md](IMAGE_CREDITS.md). Coordinates for the six destinations added
 from the report (Tonle Sap → Kampong Phluk, Beng Mealea, Koh Ker, Sambor Prei
 Kuk, Kratie, Chi Phat) are approximate town/site centres, which is enough for a
-regional forecast.
+regional forecast. The same applies to the six places added later from the
+report's "must-see" and "beyond the temples" notes (Banteay Srei, Roluos Group,
+Koh Dach, Koh Tonsay, Tatai River, Stung Treng).
 
 **Intentionally not included:** Preah Vihear Temple — the report lists it as
 closed (Thai border area). Add it back with an `advisory` once it reopens.

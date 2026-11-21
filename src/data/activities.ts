@@ -213,6 +213,43 @@ export const ACTIVITY_SUGGESTIONS: Record<string, string[]> = {
     'River Trip',
     'Waterfall Hike',
     'Wildlife Spotting'
+  ],
+  'Banteay Srei': [
+    'Banteay Srei Temple',
+    'Kbal Spean River Carvings',
+    'Temple Photography',
+    'Countryside Drive'
+  ],
+  'Roluos Group': [
+    'Bakong Temple',
+    'Preah Ko',
+    'Lolei',
+    'Temple Photography'
+  ],
+  'Koh Dach': [
+    'Silk Weaving Villages',
+    'Mekong Ferry Ride',
+    'Village Bike Ride',
+    'Riverside Lunch'
+  ],
+  'Koh Tonsay': [
+    'Boat from Kep',
+    'Beach Day',
+    'Swimming',
+    'Seafood Lunch',
+    'Island Walk'
+  ],
+  'Tatai River': [
+    'Tatai Waterfall',
+    'Mangrove Kayaking',
+    'Eco-lodge Stay',
+    'River Boat Trip'
+  ],
+  'Stung Treng': [
+    'Mekong Dolphin Spotting',
+    'Mekong River Boat Trip',
+    'Mekong Sunset',
+    'Riverside Market'
   ]
 }
 

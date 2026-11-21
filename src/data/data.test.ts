@@ -31,6 +31,25 @@ describe('destination catalog', () => {
 
   it('flags Koh Kong with a border advisory', () => {
     expect(findDestination('koh kong')?.advisory).toMatch(/border/i)
+    expect(findDestination('tatai river')?.advisory).toMatch(/border/i)
+  })
+
+  it('includes the extra report destinations, each with a credited photo', () => {
+    for (const name of ['Banteay Srei', 'Roluos Group', 'Koh Dach', 'Koh Tonsay', 'Tatai River', 'Stung Treng']) {
+      const dest = findDestination(name)
+      expect(dest, name).toBeDefined()
+      expect(dest!.image, name).toMatch(/^https:\/\/thumb\.wikimedia\.org\//)
+      expect(dest!.imageCredit?.author, name).toBeTruthy()
+    }
+  })
+
+  it('every remote photo is on an origin allowed by the CSP', () => {
+    for (const d of CAMBODIAN_DESTINATIONS) {
+      if (typeof d.image === 'string' && d.image.startsWith('http')) {
+        expect(d.image, d.name).toMatch(/^https:\/\/(thumb|upload)\.wikimedia\.org\//)
+        expect(d.imageCredit, d.name).toBeDefined()
+      }
+    }
   })
 })
 

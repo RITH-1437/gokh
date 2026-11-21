@@ -20,6 +20,12 @@ destination's emoji tile.
 | Kratie | [20171123 Sunset over Mekong Kratie 3996 DxO.jpg](https://commons.wikimedia.org/wiki/File:20171123_Sunset_over_Mekong_Kratie_3996_DxO.jpg) | Jakub Hałun | CC BY-SA 4.0 |
 | Chi Phat | [Cardamom Mountains Cambodia.jpg](https://commons.wikimedia.org/wiki/File:Cardamom_Mountains_Cambodia.jpg) | Andyb3947 | CC BY-SA 4.0 |
 | Koh Rong Sanloem | [Koh Rong Sanloem estuary.jpg](https://commons.wikimedia.org/wiki/File:Koh_Rong_Sanloem_estuary.jpg) | Wikirictor | CC BY-SA 3.0 |
+| Banteay Srei | [Banteay Srei temple (Unsplash).jpg](https://commons.wikimedia.org/wiki/File:Banteay_Srei_temple_(Unsplash).jpg) | JJ Ying | CC0 |
+| Roluos Group | [Roulos Group - 005 Bakong (8587796725).jpg](https://commons.wikimedia.org/wiki/File:Roulos_Group_-_005_Bakong_(8587796725).jpg) | Photo Dharma | CC BY 2.0 |
+| Koh Dach | [Khmer silk weaver Silk Island.jpg](https://commons.wikimedia.org/wiki/File:Khmer_silk_weaver_Silk_Island.jpg) | MoonsMoon | CC BY 4.0 |
+| Koh Tonsay | [Boats at the sandy beach of the Rabbit Island Koh Tonsay Cambodia.jpg](https://commons.wikimedia.org/wiki/File:Boats_at_the_sandy_beach_of_the_Rabbit_Island_Koh_Tonsay_Cambodia.jpg) | Didzis Šēnbergs | CC BY-SA 4.0 |
+| Tatai River | [Tatai River, Cambodia.jpg](https://commons.wikimedia.org/wiki/File:Tatai_River,_Cambodia.jpg) | Wikirictor | CC BY-SA 4.0 |
+| Stung Treng | [Stung Teng bridge Mekong Cambodia 3705.jpg](https://commons.wikimedia.org/wiki/File:Stung_Teng_bridge_Mekong_Cambodia_3705.jpg) | Christian Pirkl | CC BY-SA 4.0 |
 
 All other photos (`src/assets/images/`) are bundled with the project.
 

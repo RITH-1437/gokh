@@ -40,8 +40,8 @@
       <Icon name="check" :size="15" />
     </span>
 
-    <div :class="['absolute inset-x-0 bottom-0', compact ? 'p-2.5 sm:p-4' : 'p-4']">
-      <div :class="['font-extrabold text-white leading-tight drop-shadow truncate', compact ? 'text-[14px] sm:text-lg' : 'text-xl']">
+    <div :class="['absolute inset-x-0 bottom-0', compact ? 'p-2 sm:p-4' : 'p-4']">
+      <div :class="['font-extrabold text-white leading-tight drop-shadow', compact ? 'text-[12.5px] min-[400px]:text-[13.5px] sm:text-lg [overflow-wrap:anywhere]' : 'text-xl truncate']">
         {{ title }}
       </div>
       <div v-if="subtitle" :class="['text-white/80 leading-snug mt-0.5', compact ? 'hidden sm:block text-[12.5px]' : 'text-[13px]']">

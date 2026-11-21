@@ -25,6 +25,34 @@
       </div>
     </div>
 
+    <!-- Every other place in the catalog, grouped by region -->
+    <div>
+      <p class="text-[13px] font-bold uppercase tracking-[0.16em] text-sand-600 mb-3">
+        More places · {{ morePlacesCount }}
+      </p>
+      <div class="space-y-2.5">
+        <div v-for="group in morePlaces" :key="group.region" class="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3">
+          <span class="sm:w-24 shrink-0 text-[12px] font-semibold text-ink-mute">{{ group.region }}</span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="dest in group.places"
+              :key="dest.name"
+              type="button"
+              :aria-pressed="modelValue === dest.name"
+              :class="[
+                'chip',
+                modelValue === dest.name ? '!bg-cambodia-600 !text-white !border-cambodia-600' : '',
+              ]"
+              :title="dest.tagline"
+              @click="selectDestination(dest.name)"
+            >
+              {{ dest.name }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Contextual destination panel -->
     <div v-if="selectedDest" class="animate-slide-down surface !rounded-2xl p-5">
       <div class="flex items-center gap-3.5">
@@ -138,7 +166,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { POPULAR_DESTINATIONS, findDestination, FEES_CHECKED } from '../data/destinations'
+import type { Destination } from '../types/trip'
+import { CAMBODIAN_DESTINATIONS, POPULAR_DESTINATIONS, findDestination, FEES_CHECKED } from '../data/destinations'
 import { isInSeason, monthName } from '../utils/season'
 import { getSuggestionsForDestination } from '../data/activities'
 import Emoji3D from './Emoji3D.vue'
@@ -157,6 +186,19 @@ const emit = defineEmits<{
 
 const popularDestinations = POPULAR_DESTINATIONS
 const customDestination = ref('')
+
+// Everything not shown as a popular card, grouped by region (catalog order).
+const morePlaces = (() => {
+  const popular = new Set(POPULAR_DESTINATIONS.map(d => d.name))
+  const groups = new Map<string, Destination[]>()
+  for (const dest of CAMBODIAN_DESTINATIONS) {
+    if (popular.has(dest.name)) continue
+    const region = dest.region ?? 'Other'
+    groups.set(region, [...(groups.get(region) ?? []), dest])
+  }
+  return [...groups].map(([region, places]) => ({ region, places }))
+})()
+const morePlacesCount = morePlaces.reduce((sum, g) => sum + g.places.length, 0)
 
 const selectedDest = computed(() => findDestination(props.modelValue))
 

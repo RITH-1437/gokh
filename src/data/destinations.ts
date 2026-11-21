@@ -325,6 +325,104 @@ export const CAMBODIAN_DESTINATIONS: Destination[] = [
     image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Cardamom_Mountains_Cambodia.jpg/960px-Cardamom_Mountains_Cambodia.jpg',
     imageCredit: { author: 'Andyb3947', license: 'CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Cardamom_Mountains_Cambodia.jpg' },
     coordinates: { lat: 11.3500, lon: 103.5200 }
+  },
+  {
+    name: 'Banteay Srei',
+    region: 'Angkor',
+    emoji: '🌸',
+    tagline: 'Pink sandstone jewel of Angkor',
+    suggestedName: 'Banteay Srei Temple Trip',
+    days: '½ day',
+    bestSeason: 'Nov–Mar',
+    fees: [
+      { label: 'Angkor Pass (1-day)', price: '$37', note: 'Covers Banteay Srei and Kbal Spean' }
+    ],
+    tips: [
+      'About 1 hour north of Siem Reap — pair it with Kbal Spean.',
+      'Small 10th-century temple with the finest carving at Angkor.'
+    ],
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Banteay_Srei_temple_%28Unsplash%29.jpg/960px-Banteay_Srei_temple_%28Unsplash%29.jpg',
+    imageCredit: { author: 'JJ Ying', license: 'CC0', source: 'https://commons.wikimedia.org/wiki/File:Banteay_Srei_temple_(Unsplash).jpg' },
+    coordinates: { lat: 13.5989, lon: 103.9629 }
+  },
+  {
+    name: 'Roluos Group',
+    region: 'Angkor',
+    emoji: '🛕',
+    tagline: 'The first Angkor-era capital',
+    suggestedName: 'Roluos Temples Trip',
+    days: '½ day',
+    bestSeason: 'Nov–Mar',
+    fees: [
+      { label: 'Angkor Pass (1-day)', price: '$37', note: 'Covers the Roluos Group' }
+    ],
+    tips: [
+      'Late 9th-century temples, a short half-day trip from Siem Reap.'
+    ],
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Roulos_Group_-_005_Bakong_%288587796725%29.jpg/960px-Roulos_Group_-_005_Bakong_%288587796725%29.jpg',
+    imageCredit: { author: 'Photo Dharma', license: 'CC BY 2.0', source: 'https://commons.wikimedia.org/wiki/File:Roulos_Group_-_005_Bakong_(8587796725).jpg' },
+    coordinates: { lat: 13.3361, lon: 103.9740 }
+  },
+  {
+    name: 'Koh Dach',
+    region: 'Capital',
+    emoji: '🧵',
+    tagline: 'Silk Island on the Mekong',
+    suggestedName: 'Silk Island Day Trip',
+    days: '½ day',
+    bestSeason: 'Nov–Mar',
+    tips: [
+      'Reach the island by ferry or on a tour from Phnom Penh.'
+    ],
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Khmer_silk_weaver_Silk_Island.jpg/960px-Khmer_silk_weaver_Silk_Island.jpg',
+    imageCredit: { author: 'MoonsMoon', license: 'CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Khmer_silk_weaver_Silk_Island.jpg' },
+    coordinates: { lat: 11.6440, lon: 104.9580 }
+  },
+  {
+    name: 'Koh Tonsay',
+    region: 'South coast',
+    emoji: '🐇',
+    tagline: 'Rabbit Island off Kep',
+    suggestedName: 'Rabbit Island Escape',
+    days: '1 day',
+    bestSeason: 'Nov–May',
+    tips: [
+      'Boats leave from Kep; seas are calmest from November to May.'
+    ],
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Boats_at_the_sandy_beach_of_the_Rabbit_Island_Koh_Tonsay_Cambodia.jpg/960px-Boats_at_the_sandy_beach_of_the_Rabbit_Island_Koh_Tonsay_Cambodia.jpg',
+    imageCredit: { author: 'Didzis Šēnbergs', license: 'CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Boats_at_the_sandy_beach_of_the_Rabbit_Island_Koh_Tonsay_Cambodia.jpg' },
+    coordinates: { lat: 10.4567, lon: 104.3236 }
+  },
+  {
+    name: 'Tatai River',
+    region: 'Southwest',
+    emoji: '🛶',
+    tagline: 'Eco-lodges and mangroves in the Cardamoms',
+    suggestedName: 'Tatai River Eco Trip',
+    days: '1–2 days',
+    bestSeason: 'Nov–Apr',
+    advisory: 'Tatai is in Koh Kong province, near the Thai border area some governments advise against. Check the latest travel advice before booking.',
+    tips: [
+      'Stay on marked paths in forests and rural areas — landmines remain in some places.'
+    ],
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Tatai_River%2C_Cambodia.jpg/960px-Tatai_River%2C_Cambodia.jpg',
+    imageCredit: { author: 'Wikirictor', license: 'CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Tatai_River,_Cambodia.jpg' },
+    coordinates: { lat: 11.5870, lon: 103.1110 }
+  },
+  {
+    name: 'Stung Treng',
+    region: 'Northeast',
+    emoji: '🌊',
+    tagline: 'Quiet Mekong river town',
+    suggestedName: 'Stung Treng Mekong Trip',
+    days: '1–2 days',
+    bestSeason: 'Dec–May',
+    tips: [
+      'Irrawaddy dolphins live in the Mekong deep pools here; the dry season is best.'
+    ],
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Stung_Teng_bridge_Mekong_Cambodia_3705.jpg/960px-Stung_Teng_bridge_Mekong_Cambodia_3705.jpg',
+    imageCredit: { author: 'Christian Pirkl', license: 'CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Stung_Teng_bridge_Mekong_Cambodia_3705.jpg' },
+    coordinates: { lat: 13.5259, lon: 105.9683 }
   }
 ]
 

@@ -81,7 +81,7 @@
               </li>
               <li class="rounded-2xl bg-white/10 px-3.5 py-3">
                 <div class="text-[11px] uppercase tracking-wider text-white/60">When</div>
-                <div class="mt-0.5 text-[14px] font-bold tnum truncate">
+                <div class="mt-0.5 text-[14px] font-bold tnum leading-snug">
                   {{ trip.startDate && trip.endDate ? formatTripRange(trip.startDate, trip.endDate) : '—' }}
                 </div>
               </li>

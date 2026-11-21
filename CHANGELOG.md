@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — 2026-11-21 · More places & mobile polish
+
+### Added
+- 6 more destinations from the report, each with a credited Wikimedia photo,
+  stay, season and activity ideas: Banteay Srei, Roluos Group, Koh Dach
+  (Silk Island), Koh Tonsay (Rabbit Island), Tatai River (with border advice)
+  and Stung Treng. The catalog now has 26 places.
+- "More places" list in the destination step: every place beyond the 7 popular
+  cards is now one tap away, grouped by region (previously you had to type the name).
+
+### Fixed
+- Mobile: transport/stay card titles ("Motorcycle", "Guesthouse") were cut off
+  on phones; the hero trip card's dates were truncated.
+- Reduced motion: entrance animations still waited for their delays and money
+  totals still counted up; both now appear instantly.
+
 ## Unreleased — 2026-11-21 · Immersive redesign (continued)
 
 ### Changed

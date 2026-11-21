@@ -23,6 +23,13 @@ export const useAnimatedNumber = (duration = 400) => {
   const set = (next: number) => {
     from = current
     target = next
+    // Respect "reduce motion": jump straight to the value.
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      cancelAnimationFrame(rafId)
+      current = next
+      value.value = next
+      return
+    }
     startTime = performance.now()
     cancelAnimationFrame(rafId)
     rafId = requestAnimationFrame(tick)
