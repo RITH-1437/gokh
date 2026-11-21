@@ -4,22 +4,30 @@
       <!-- Start tile -->
       <div class="flex-1 min-w-0">
         <p class="text-[13px] font-semibold text-ink-soft mb-2">Start</p>
-        <button
-          type="button"
-          aria-label="Pick start date"
-          class="w-full flex flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-stone-200/80 bg-white px-2 py-4 sm:py-5 transition-all duration-200 hover:border-cambodia-300 hover:-translate-y-0.5 hover:shadow-soft focus-ring active:scale-[.98]"
-          @click="pick('start')"
-        >
-          <span class="text-4xl sm:text-6xl font-extrabold text-ink leading-none tnum">
-            {{ startTile?.day || '–' }}
+        <!-- The real date input sits on top of the tile so a tap opens the
+             native picker directly. Opening a hidden input from script
+             (showPicker/focus) is unreliable on phones, especially iOS Safari. -->
+        <label class="group relative block">
+          <input
+            v-model="startDate"
+            type="date"
+            :min="minDate"
+            :class="overlayInputClass"
+            aria-label="Start date"
+            @click="openPicker"
+          />
+          <span :class="tileClass" aria-hidden="true">
+            <span class="text-4xl sm:text-6xl font-extrabold text-ink leading-none tnum">
+              {{ startTile?.day || '–' }}
+            </span>
+            <span class="mt-1.5 text-[12px] sm:text-sm font-bold text-sand-600 tracking-[0.14em]">
+              {{ startTile?.month || 'MONTH' }}
+            </span>
+            <span class="text-[11px] sm:text-[13px] text-ink-mute">
+              {{ startTile?.weekday || 'Pick a date' }}
+            </span>
           </span>
-          <span class="mt-1.5 text-[12px] sm:text-sm font-bold text-sand-600 tracking-[0.14em]">
-            {{ startTile?.month || 'MONTH' }}
-          </span>
-          <span class="text-[11px] sm:text-[13px] text-ink-mute">
-            {{ startTile?.weekday || 'Pick a date' }}
-          </span>
-        </button>
+        </label>
       </div>
 
       <!-- Connector -->
@@ -33,22 +41,28 @@
       <!-- End tile -->
       <div class="flex-1 min-w-0">
         <p class="text-[13px] font-semibold text-ink-soft mb-2">End</p>
-        <button
-          type="button"
-          aria-label="Pick end date"
-          class="w-full flex flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-stone-200/80 bg-white px-2 py-4 sm:py-5 transition-all duration-200 hover:border-cambodia-300 hover:-translate-y-0.5 hover:shadow-soft focus-ring active:scale-[.98]"
-          @click="pick('end')"
-        >
-          <span class="text-4xl sm:text-6xl font-extrabold text-ink leading-none tnum">
-            {{ endTile?.day || '–' }}
+        <label class="group relative block">
+          <input
+            v-model="endDate"
+            type="date"
+            :min="startDate || minDate"
+            :max="maxEndDate"
+            :class="overlayInputClass"
+            aria-label="End date"
+            @click="openPicker"
+          />
+          <span :class="tileClass" aria-hidden="true">
+            <span class="text-4xl sm:text-6xl font-extrabold text-ink leading-none tnum">
+              {{ endTile?.day || '–' }}
+            </span>
+            <span class="mt-1.5 text-[12px] sm:text-sm font-bold text-sand-600 tracking-[0.14em]">
+              {{ endTile?.month || 'MONTH' }}
+            </span>
+            <span class="text-[11px] sm:text-[13px] text-ink-mute">
+              {{ endTile?.weekday || 'Pick a date' }}
+            </span>
           </span>
-          <span class="mt-1.5 text-[12px] sm:text-sm font-bold text-sand-600 tracking-[0.14em]">
-            {{ endTile?.month || 'MONTH' }}
-          </span>
-          <span class="text-[11px] sm:text-[13px] text-ink-mute">
-            {{ endTile?.weekday || 'Pick a date' }}
-          </span>
-        </button>
+        </label>
       </div>
     </div>
 
@@ -62,25 +76,6 @@
         </span>
       </div>
     </div>
-
-    <!-- Hidden native date inputs -->
-    <input
-      ref="startInput"
-      v-model="startDate"
-      type="date"
-      :min="minDate"
-      class="sr-only"
-      aria-label="Start date"
-    />
-    <input
-      ref="endInput"
-      v-model="endDate"
-      type="date"
-      :min="startDate || minDate"
-      :max="maxEndDate"
-      class="sr-only"
-      aria-label="End date"
-    />
 
     <!-- Duration -->
     <div v-if="duration" class="mt-4 flex items-center justify-center gap-2 animate-slide-down">
@@ -150,8 +145,12 @@ const maxEndDate = computed(() => {
   return `${last.getFullYear()}-${pad(last.getMonth() + 1)}-${pad(last.getDate())}`
 })
 
-const startInput = ref<HTMLInputElement>()
-const endInput = ref<HTMLInputElement>()
+// Transparent native input covering the tile. text-base (16px) stops iOS
+// Safari from zooming the page when the input gains focus.
+const overlayInputClass =
+  'peer absolute inset-0 z-10 h-full w-full cursor-pointer appearance-none opacity-0 text-base'
+const tileClass =
+  'w-full flex flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-stone-200/80 bg-white px-2 py-4 sm:py-5 transition-all duration-200 group-hover:border-cambodia-300 group-hover:-translate-y-0.5 group-hover:shadow-soft group-active:scale-[.98] peer-focus-visible:ring-4 peer-focus-visible:ring-cambodia-200 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-ivory'
 
 const startTile = computed(() => (startDate.value ? formatDateTile(startDate.value) : null))
 const endTile = computed(() => (endDate.value ? formatDateTile(endDate.value) : null))
@@ -172,13 +171,15 @@ const daysUntilStart = computed(() => {
   return diff < 0 ? null : diff
 })
 
-const pick = (which: 'start' | 'end') => {
-  const input = which === 'start' ? startInput.value : endInput.value
-  if (!input) return
-  if (typeof (input as HTMLInputElement).showPicker === 'function') {
-    ;(input as HTMLInputElement).showPicker()
-  } else {
-    input.focus()
+// Phones open the native picker on tap by themselves. Desktop browsers only
+// open it from the small calendar icon, so ask for it explicitly. showPicker
+// can throw (already open, unsupported), which is harmless here.
+const openPicker = (event: MouseEvent) => {
+  const input = event.currentTarget as HTMLInputElement
+  try {
+    input.showPicker?.()
+  } catch {
+    // The tap itself already focused the input; nothing else to do.
   }
 }
 

@@ -66,7 +66,7 @@ export const useTrip = (options: UseTripOptions = {}) => {
   // tampered link (the param is removed either way so a refresh is clean).
   const loadTripFromUrl = async (): Promise<TripLoadStatus> => {
     try {
-      const result = readTripFromUrl()
+      const result = await readTripFromUrl()
       if (result.status === 'none') return 'none'
       window.history.replaceState({}, '', window.location.pathname)
       if (result.status === 'invalid') {

@@ -8,9 +8,9 @@ export const useTripShare = () => {
   const isSharing = ref(false)
   const error = ref<string | null>(null)
 
-  const generateShareUrl = (trip: Trip): string => {
+  const generateShareUrl = async (trip: Trip): Promise<string> => {
     try {
-      const url = generateTripUrl(trip)
+      const url = await generateTripUrl(trip)
       shareUrl.value = url
       return url
     } catch (err) {
@@ -53,10 +53,10 @@ export const useTripShare = () => {
     error.value = null
 
     try {
-      const url = generateShareUrl(trip)
+      const url = await generateShareUrl(trip)
 
       // Update browser URL
-      updateBrowserUrl(trip)
+      await updateBrowserUrl(trip)
 
       // Always copy to clipboard. The native share sheet (navigator.share)
       // opens a small system modal that can hang the UI on desktop, tablet
@@ -71,9 +71,9 @@ export const useTripShare = () => {
     }
   }
 
-  const loadSharedTrip = (): Trip | null => {
+  const loadSharedTrip = async (): Promise<Trip | null> => {
     try {
-      return extractTripFromUrl()
+      return await extractTripFromUrl()
     } catch (err) {
       error.value = 'Failed to load shared trip'
       console.error(err)
@@ -81,9 +81,9 @@ export const useTripShare = () => {
     }
   }
 
-  const updateBrowserUrl = (trip: Trip) => {
+  const updateBrowserUrl = async (trip: Trip) => {
     try {
-      const url = generateTripUrl(trip)
+      const url = await generateTripUrl(trip)
       window.history.replaceState({}, '', url)
     } catch (err) {
       console.error('Failed to update browser URL:', err)
@@ -99,6 +99,6 @@ export const useTripShare = () => {
     copyToClipboard,
     shareTrip,
     loadSharedTrip,
-    updateBrowserUrl
+    updateBrowserUrl,
   }
 }

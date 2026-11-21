@@ -33,6 +33,29 @@ describe('DateRangePicker', () => {
     expect(wrapper.emitted('update:endDate')).toEqual([['']])
   })
 
+  it('REGRESSION: date inputs cover the tiles so a phone tap opens the native picker', () => {
+    const wrapper = mountPicker()
+    for (const label of ['Start date', 'End date']) {
+      const input = wrapper.find(`input[aria-label="${label}"]`)
+      const classes = input.classes()
+      // Not a visually-hidden 1px input opened from script (broken on iOS).
+      expect(classes).not.toContain('sr-only')
+      expect(classes).toEqual(expect.arrayContaining(['absolute', 'inset-0', 'opacity-0']))
+      // >=16px font stops iOS Safari zooming the page on focus.
+      expect(classes).toContain('text-base')
+      expect(input.element.closest('label')).not.toBeNull()
+    }
+  })
+
+  it('opening the picker does not throw when showPicker is unsupported or fails', async () => {
+    const wrapper = mountPicker()
+    const input = wrapper.find('input[aria-label="Start date"]')
+    ;(input.element as HTMLInputElement).showPicker = () => {
+      throw new DOMException('not allowed', 'NotAllowedError')
+    }
+    await expect(input.trigger('click')).resolves.not.toThrow()
+  })
+
   it('does not emit anything on mount', () => {
     const wrapper = mountPicker('2026-12-05', '2026-12-07')
     expect(wrapper.emitted()).not.toHaveProperty('update:startDate')

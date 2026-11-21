@@ -111,7 +111,7 @@ describe('shared links', () => {
     const shared = useTrip()
     shared.trip.value.tripName = 'Shared'
     shared.trip.value.destination = 'Kep'
-    window.history.replaceState({}, '', `/?trip=${encodeTripToUrl(shared.trip.value)}`)
+    window.history.replaceState({}, '', `/?trip=${await encodeTripToUrl(shared.trip.value)}`)
 
     const t = useTrip()
     expect(await t.loadTripFromUrl()).toBe('loaded')
