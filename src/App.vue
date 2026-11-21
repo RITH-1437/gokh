@@ -5,7 +5,6 @@ import HeroSection from './components/HeroSection.vue'
 import TripProgress from './components/TripProgress.vue'
 import SectionShell from './components/SectionShell.vue'
 import Reveal from './components/Reveal.vue'
-import Emoji3D from './components/Emoji3D.vue'
 import Icon from './components/icons/Icon.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import DestinationSelector from './components/DestinationSelector.vue'
@@ -281,7 +280,6 @@ const mobileSummary = computed(() => {
       class="animate-slide-down bg-cambodia-600 text-white"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-2.5 text-[13px]">
-        <Icon name="link" :size="15" class="flex-none" />
         <span class="flex-1 min-w-0 truncate">
           <template v-if="hasUnsavedEdits">
             <span class="font-bold">Changes ready to share.</span>
@@ -306,11 +304,11 @@ const mobileSummary = computed(() => {
         @preview="scrollToPreview"
       />
 
-      <!-- Progress -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <Reveal>
+      <!-- Progress (sticks under the header while planning) -->
+      <div class="sticky top-16 z-40 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-5">
+        <div class="rounded-2xl bg-white/85 backdrop-blur-md border border-stone-200/70 shadow-soft px-4 sm:px-5 py-3">
           <TripProgress :steps="steps" :current-key="currentKey" @navigate="navigateToStep" />
-        </Reveal>
+        </div>
       </div>
 
       <!-- Builder + preview -->
@@ -455,7 +453,6 @@ const mobileSummary = computed(() => {
             <!-- Start over -->
             <div class="pl-[44px] sm:pl-[58px] pb-4">
               <button class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-mute hover:text-clay-600 transition-colors" @click="handleReset">
-                <Icon name="refresh-cw" :size="14" />
                 Start over
               </button>
             </div>
@@ -467,14 +464,12 @@ const mobileSummary = computed(() => {
               <TripPreview :trip="trip" :per-person-budget="perPersonBudget" @update:trip-name="updateTripName" />
 
               <!-- Directions -->
-              <div v-if="trip.destination" class="surface !rounded-2xl p-4 flex items-center gap-3">
-                <Emoji3D emoji="🧭" size="sm" shape="tile" />
+              <div v-if="trip.destination" class="surface !rounded-2xl px-5 py-4 flex items-center gap-3">
                 <div class="flex-1 min-w-0">
-                  <div class="font-bold text-ink text-sm">Get there</div>
-                  <div class="text-[12px] text-ink-mute truncate">{{ trip.destination }}, Cambodia</div>
+                  <div class="text-[11px] font-bold uppercase tracking-[0.16em] text-sand-600">Get there</div>
+                  <div class="text-[14px] font-bold text-ink truncate">{{ trip.destination }}, Cambodia</div>
                 </div>
-                <button class="btn-ghost !h-10 !px-3.5 text-sm shrink-0" @click="getDirections(trip.destination)">
-                  <Icon name="navigation-2" :size="14" />
+                <button class="btn-ghost !h-10 !px-4 text-sm shrink-0" @click="getDirections(trip.destination)">
                   Directions
                 </button>
               </div>
@@ -489,14 +484,12 @@ const mobileSummary = computed(() => {
         <div class="lg:hidden mt-10 space-y-5" id="preview-mobile">
           <TripPreview :trip="trip" :per-person-budget="perPersonBudget" @update:trip-name="updateTripName" />
 
-          <div v-if="trip.destination" class="surface !rounded-2xl p-4 flex items-center gap-3">
-            <Emoji3D emoji="🧭" size="sm" shape="tile" />
+          <div v-if="trip.destination" class="surface !rounded-2xl px-5 py-4 flex items-center gap-3">
             <div class="flex-1 min-w-0">
-              <div class="font-bold text-ink text-sm">Get there</div>
-              <div class="text-[12px] text-ink-mute truncate">{{ trip.destination }}, Cambodia</div>
+              <div class="text-[11px] font-bold uppercase tracking-[0.16em] text-sand-600">Get there</div>
+              <div class="text-[14px] font-bold text-ink truncate">{{ trip.destination }}, Cambodia</div>
             </div>
-            <button class="btn-ghost !h-10 !px-3.5 text-sm shrink-0" @click="getDirections(trip.destination)">
-              <Icon name="navigation-2" :size="14" />
+            <button class="btn-ghost !h-10 !px-4 text-sm shrink-0" @click="getDirections(trip.destination)">
               Directions
             </button>
           </div>
@@ -508,14 +501,19 @@ const mobileSummary = computed(() => {
       </div>
 
       <!-- Footer -->
-      <footer class="mt-6 pb-24 lg:pb-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-stone-200/70 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2 text-ink-soft text-sm">
-            <span class="text-base">🇰🇭</span>
-            <span class="font-bold text-ink">GoKH</span>
-            <span>— Explore Cambodia together.</span>
+      <footer class="mt-10 bg-cambodia-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-28 lg:pb-12 grid gap-8 sm:grid-cols-[1.4fr_1fr]">
+          <div>
+            <div class="text-2xl font-extrabold tracking-tight">GoKH</div>
+            <p class="mt-2 text-[14px] text-white/70 max-w-sm leading-relaxed">
+              Plan a Cambodia trip with your crew — destinations, budget, itinerary — and share it all in one link.
+            </p>
           </div>
-          <p class="text-[12.5px] text-ink-mute">Plan it. Pack it. Go.</p>
+          <div class="sm:text-right text-[13px] text-white/60 space-y-1.5">
+            <p>Plan it. Pack it. Go.</p>
+            <p>Weather by Open-Meteo · Some photos from Wikimedia Commons</p>
+            <p>Fees and travel advice checked Nov 2026 — always confirm before you go.</p>
+          </div>
         </div>
       </footer>
     </main>
@@ -525,19 +523,18 @@ const mobileSummary = computed(() => {
       v-if="showStickyShare"
       class="fixed bottom-0 inset-x-0 z-40 lg:hidden animate-slide-up"
     >
-      <div class="bg-ivory/90 backdrop-blur-md border-t border-stone-200/70 px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lift">
+      <div class="bg-cambodia-900/90 backdrop-blur-xl border-t border-white/10 px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lift text-white">
         <div class="flex items-center gap-3 max-w-7xl mx-auto">
           <div class="flex-1 min-w-0">
-            <div class="text-[13.5px] font-bold text-ink truncate">
+            <div class="text-[13.5px] font-bold text-white truncate">
               {{ trip.tripName || trip.destination || 'Plan your trip' }}
             </div>
-            <div v-if="mobileSummary" class="text-[11.5px] text-ink-mute truncate tnum">
+            <div v-if="mobileSummary" class="text-[11.5px] text-white/65 truncate tnum">
               {{ mobileSummary }}
             </div>
           </div>
           <button class="btn-gold !h-11 !px-5 shrink-0" :disabled="isSharing" @click="handleShare">
             <Icon v-if="isSharing" name="loader" :size="16" class="animate-spin" />
-            <Icon v-else name="link" :size="16" />
             <span>Share trip</span>
           </button>
         </div>

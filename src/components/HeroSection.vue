@@ -28,7 +28,6 @@
         <!-- Copy -->
         <div class="max-w-xl">
           <div class="animate-fade-up glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-semibold text-white/95" style="animation-delay: 60ms">
-            <span class="text-[15px]">🇰🇭</span>
             Explore Cambodia together
           </div>
 
@@ -52,13 +51,11 @@
               class="glass inline-flex items-center justify-center gap-2 h-[52px] px-6 rounded-2xl font-semibold text-[15px] text-white hover:bg-white/20 transition-colors duration-200 focus-ring w-full sm:w-auto"
               @click="emit('preview')"
             >
-              <Icon name="sparkles" :size="17" class="text-sand-300" />
               View trip card
             </button>
           </div>
 
           <div class="animate-fade-up mt-8 flex items-center gap-2 text-[12.5px] text-white/70" style="animation-delay: 380ms">
-            <Icon name="map-pin" :size="14" />
             <span>{{ heroCaption }}</span>
           </div>
         </div>
@@ -69,7 +66,6 @@
             <div class="flex items-center justify-between gap-3">
               <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-sand-200">Your trip</span>
               <span v-if="loadedFromUrl" class="inline-flex items-center gap-1.5 text-[12px] font-semibold bg-white/15 rounded-full px-2.5 py-1">
-                <Icon name="link" :size="12" />
                 Shared
               </span>
             </div>

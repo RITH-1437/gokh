@@ -55,7 +55,6 @@
     <!-- Days until the trip starts -->
     <div v-if="daysUntilStart !== null" class="mt-3 flex items-center justify-center animate-slide-down">
       <div class="inline-flex items-center gap-2 rounded-full bg-sand-100 border border-sand-200 text-sand-800 px-4 py-1.5 shadow-soft">
-        <span class="text-sm">{{ daysUntilStart === 0 ? '🎉' : '⏳' }}</span>
         <span class="text-[13px] font-bold tnum">
           <template v-if="daysUntilStart === 0">Your trip starts today!</template>
           <template v-else-if="daysUntilStart === 1">1 day to go — starts tomorrow</template>
@@ -86,7 +85,6 @@
     <!-- Duration -->
     <div v-if="duration" class="mt-4 flex items-center justify-center gap-2 animate-slide-down">
       <div class="inline-flex items-center gap-2 rounded-full bg-cambodia-600 text-white px-4 py-2 shadow-glow">
-        <span class="text-base">🗓️</span>
         <span class="text-sm font-bold tnum">
           {{ duration.days }} day{{ duration.days > 1 ? 's' : '' }}
         </span>

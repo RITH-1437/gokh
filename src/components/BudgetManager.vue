@@ -71,7 +71,6 @@
       v-if="perPersonBudget > 0"
       class="relative mt-5 flex items-center gap-2.5 rounded-2xl bg-sand-50 border border-sand-200/70 px-4 py-3"
     >
-      <Emoji3D emoji="👛" size="xs" />
       <span class="text-[13px] text-ink-soft">
         <span class="font-bold text-ink tnum">{{ formatCurrency(perPersonBudget, budget.currency) }}</span>
         per traveler
@@ -96,7 +95,6 @@ import type { Budget, Currency } from '../types/trip'
 import { USD_TO_KHR, formatCurrency, formatNumber, convertCurrency, currencySymbol, parseAmountInput } from '../utils/currency'
 import { validateBudget } from '../utils/validation'
 import { useAnimatedNumber } from '../composables/useAnimatedNumber'
-import Emoji3D from './Emoji3D.vue'
 import WarningAlert from './WarningAlert.vue'
 
 const props = defineProps<{
@@ -138,9 +136,9 @@ const progressPercent = computed(() => {
 const statusText = computed(() => {
   if (props.isOverBudget) {
     const over = Math.abs(props.totalContributed - budget.value.total)
-    return `⚠ ${formatCurrency(over, budget.value.currency)} over budget`
+    return `${formatCurrency(over, budget.value.currency)} over budget`
   }
-  if (budget.value.total > 0 && props.totalContributed >= budget.value.total) return '✓ Fully funded'
+  if (budget.value.total > 0 && props.totalContributed >= budget.value.total) return 'Fully funded'
   if (props.totalContributed > 0) return `${progressPercent.value}% funded`
   return 'Set a budget to get started'
 })

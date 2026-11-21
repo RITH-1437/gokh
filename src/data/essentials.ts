@@ -46,14 +46,12 @@ export const CHECKLIST_IDS = PRE_TRIP_CHECKLIST.map(item => item.id)
 
 export interface InfoBlock {
   title: string
-  emoji: string
   lines: string[]
 }
 
 export const PRACTICAL_INFO: InfoBlock[] = [
   {
     title: 'Airports',
-    emoji: '✈️',
     lines: [
       'Techo International (KTI) — Phnom Penh, ~20 km from the city',
       'Siem Reap-Angkor (SAI) — about an hour by road to town',
@@ -62,7 +60,6 @@ export const PRACTICAL_INFO: InfoBlock[] = [
   },
   {
     title: 'Seasons',
-    emoji: '🌦️',
     lines: [
       'Nov–Feb: cool & dry, peak season',
       'Mar–May: hottest, low-to-mid 30s °C',
@@ -71,7 +68,6 @@ export const PRACTICAL_INFO: InfoBlock[] = [
   },
   {
     title: 'Getting around',
-    emoji: '🛺',
     lines: [
       'Buses & minivans between cities; Phnom Penh–Siem Reap ~6 h',
       'Royal Railway train to Kampot and Sihanoukville',
@@ -80,7 +76,6 @@ export const PRACTICAL_INFO: InfoBlock[] = [
   },
   {
     title: 'Stay safe',
-    emoji: '🛡️',
     lines: [
       'Stay on marked paths in rural areas — landmines remain in places',
       'Watch bags in cities — snatching from motorbikes happens',

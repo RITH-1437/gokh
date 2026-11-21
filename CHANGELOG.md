@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased — 2026-11-21 · Immersive redesign (continued)
+
+### Changed
+- New shared `PhotoChoiceCard`: destination, transport and stay choices are now
+  full-photo cards with a clear selected state (falls back to a tile if a photo fails).
+- Restyled the section headers, sticky progress bar, trip card, share panel,
+  mobile share bar and footer (now dark) to match the photo hero.
+- Fewer icons: removed decorative emojis and icons from the hero, header,
+  destination panel, dates, budget, itinerary, travelers and "Before you go".
+  Kept only the ones that carry meaning or are tap targets (selected check,
+  travel-advice warning, edit/delete/add, leader crown, per-day weather).
+
 ## Unreleased — 2026-11-21 · Audit & hardening
 
 ### Fixed

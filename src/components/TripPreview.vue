@@ -1,23 +1,22 @@
 <template>
-  <div class="surface overflow-hidden">
+  <div class="surface !rounded-[28px] overflow-hidden shadow-lift">
     <!-- Header band -->
-    <div class="relative bg-gradient-to-br from-cambodia-700 via-cambodia-800 to-cambodia-900 px-5 sm:px-6 pt-5 pb-5 text-white overflow-hidden">
+    <div class="relative bg-gradient-to-br from-cambodia-700 via-cambodia-800 to-cambodia-900 px-5 sm:px-6 pt-24 pb-5 text-white overflow-hidden">
       <img
         v-if="destImage && !imageFailed"
         :src="destImage"
         alt=""
         loading="lazy"
         decoding="async"
-        class="absolute inset-0 h-full w-full object-cover opacity-45"
+        class="absolute inset-0 h-full w-full object-cover"
         @error="imageFailed = true"
       />
-      <div class="absolute inset-0 bg-gradient-to-br from-cambodia-800/80 via-cambodia-800/60 to-cambodia-900/90" />
-      <div class="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20" style="background: radial-gradient(closest-side, #E2BD76, transparent)" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/5" />
 
       <div class="relative flex items-start justify-between gap-3">
         <div class="min-w-0">
-          <div class="text-[10px] font-bold tracking-[0.22em] uppercase text-sand-300">
-            GoKH · Trip
+          <div class="inline-flex glass rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-[0.2em] uppercase text-white/90">
+            Trip card
           </div>
 
           <!-- Editable trip name -->
@@ -45,17 +44,14 @@
             @blur="saveName"
           />
         </div>
-        <span class="flex-none text-xl sm:text-2xl" title="Cambodia">🇰🇭</span>
       </div>
 
       <!-- Destination + dates -->
       <div class="relative mt-3.5 space-y-1">
         <div class="flex items-center gap-2 text-[15px] font-semibold text-white/95">
-          <span class="text-base">📍</span>
           <span>{{ trip.destination || 'Choose a destination' }}</span>
         </div>
         <div v-if="trip.startDate && trip.endDate" class="flex items-center gap-2 text-[13px] text-white/70 tnum">
-          <span class="text-sm">🗓️</span>
           <span>{{ formatTripRange(trip.startDate, trip.endDate) }}</span>
           <span class="text-white/40">·</span>
           <span v-if="duration">{{ duration.days }} days · {{ duration.nights }} nights</span>
@@ -116,10 +112,10 @@
       <!-- Transport · Stay -->
       <div v-if="trip.transportation.type || trip.accommodation.type" class="flex flex-wrap gap-2">
         <span v-if="trip.transportation.type" class="chip !bg-ivory">
-          {{ transport.emoji }} {{ transport.label }}
+          {{ transport.label }}
         </span>
         <span v-if="trip.accommodation.type" class="chip !bg-ivory">
-          {{ accommodation.emoji }} {{ accommodation.label }}
+          {{ accommodation.label }}
         </span>
       </div>
 

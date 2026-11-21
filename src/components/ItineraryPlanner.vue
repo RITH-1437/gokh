@@ -2,7 +2,6 @@
   <div class="space-y-5">
     <!-- Weather context note (friendly, not an error) -->
     <div v-if="weatherError" class="animate-fade-in flex items-start gap-3 rounded-2xl bg-sand-50 border border-sand-200/70 px-4 py-3.5">
-      <Emoji3D emoji="🌤️" size="xs" />
       <div class="text-[13.5px] text-ink-soft leading-snug">
         <span class="font-bold text-ink">Weather preview.</span>
         {{ weatherError }}
@@ -11,10 +10,7 @@
 
     <!-- Route templates (only while nothing is planned yet) -->
     <div v-if="itinerary.length > 0 && !anyActivities" class="surface !rounded-2xl p-4 sm:p-5 animate-fade-in">
-      <div class="flex items-center gap-2 mb-1">
-        <Icon name="route" :size="16" class="text-cambodia-700" />
-        <p class="font-bold text-ink text-[15px]">Start from a route</p>
-      </div>
+      <p class="font-bold text-ink text-[15px] mb-1">Start from a route</p>
       <p class="text-[13px] text-ink-mute mb-3">
         Fill your {{ itinerary.length }} day{{ itinerary.length > 1 ? 's' : '' }} with a tried-and-tested route — edit anything afterwards.
       </p>
@@ -34,8 +30,7 @@
 
     <!-- Empty state -->
     <div v-if="itinerary.length === 0" class="surface !rounded-3xl px-6 py-10 flex flex-col items-center text-center">
-      <Emoji3D emoji="🗺️" size="xl" float />
-      <p class="mt-5 font-extrabold text-ink text-lg">Your adventure is waiting.</p>
+      <p class="font-extrabold text-ink text-lg">Your adventure is waiting.</p>
       <p class="text-sm text-ink-mute mt-1 max-w-sm">
         Choose your dates to start building your itinerary.
       </p>
@@ -79,7 +74,6 @@
           <div class="ml-auto flex items-center gap-2">
             <!-- Stop count chip -->
             <span v-if="day.activities.length" class="chip !pointer-events-none !bg-white hidden sm:inline-flex">
-              <Icon name="flag" :size="12" class="text-sand-600" />
               {{ day.activities.length }} stop{{ day.activities.length > 1 ? 's' : '' }}
             </span>
             <!-- Weather chip for this day -->
@@ -123,12 +117,10 @@
 
                 <div v-if="activity.startTime || activity.endTime" class="mt-1.5 flex flex-wrap gap-2">
                   <span v-if="activity.startTime && activity.endTime" class="chip !bg-ivory tnum text-[11.5px] whitespace-nowrap">
-                    <Icon name="clock" :size="12" class="text-cambodia-700" />
                     {{ activity.startTime }}–{{ activity.endTime }}
                     <span class="text-ink-mute">· {{ timeDuration(activity.startTime, activity.endTime) }}</span>
                   </span>
                   <span v-else-if="activity.startTime" class="chip !bg-ivory tnum text-[11.5px] whitespace-nowrap">
-                    <Icon name="clock" :size="12" class="text-cambodia-700" />
                     {{ activity.startTime }}
                   </span>
                 </div>
@@ -149,7 +141,6 @@
                     class="chip group whitespace-nowrap"
                     @click="emit('directions', activity.name || destination)"
                   >
-                    <Icon name="navigation-2" :size="13" class="text-cambodia-600" />
                     Directions
                     <Icon name="external-link" :size="12" class="opacity-40 group-hover:opacity-80 transition-opacity" />
                   </button>
@@ -267,7 +258,7 @@
               class="chip"
               @click="addSuggested(dayIndex, suggestion)"
             >
-              ✦ {{ suggestion }}
+              + {{ suggestion }}
             </button>
           </div>
         </div>
@@ -282,7 +273,6 @@ import type { ItineraryDay, Activity, WeatherDay } from '../types/trip'
 import { formatDate, parseISODate } from '../utils/dates'
 import { getSuggestionsForDestination } from '../data/activities'
 import { ROUTE_TEMPLATES } from '../data/routes'
-import Emoji3D from './Emoji3D.vue'
 import Icon from './icons/Icon.vue'
 
 interface NewActivity {

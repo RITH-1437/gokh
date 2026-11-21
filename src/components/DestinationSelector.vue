@@ -9,63 +9,19 @@
 
       <!-- Mobile: horizontal snap scroll · Desktop: grid -->
       <div class="flex gap-3.5 overflow-x-auto no-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:overflow-visible lg:gap-3.5">
-        <button
+        <PhotoChoiceCard
           v-for="dest in popularDestinations"
           :key="dest.name"
-          type="button"
-          :aria-pressed="modelValue === dest.name"
-          @click="selectDestination(dest.name)"
-          :class="[
-            'group relative snap-start shrink-0 w-[220px] lg:w-auto h-[260px] sm:h-[280px] overflow-hidden rounded-[26px] text-left transition-all duration-300 will-change-transform focus-ring active:scale-[.97]',
-            modelValue === dest.name
-              ? 'ring-[3px] ring-cambodia-500 ring-offset-[3px] ring-offset-ivory shadow-glow'
-              : 'shadow-soft hover:-translate-y-1.5 hover:shadow-lift'
-          ]"
-        >
-          <img
-            v-if="dest.image"
-            :src="dest.image"
-            :alt="dest.name"
-            loading="lazy"
-            decoding="async"
-            class="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
-          />
-          <div v-else class="absolute inset-0 bg-cambodia-700 flex items-center justify-center">
-            <Emoji3D :emoji="dest.emoji || '📍'" size="lg" shape="tile" tone="green" />
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/0" />
-
-          <span class="absolute top-3 left-3 glass inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-            <span class="text-[12px] leading-none">{{ dest.emoji }}</span>
-            {{ dest.region }}
-          </span>
-
-          <span
-            v-if="modelValue === dest.name"
-            class="absolute top-3 right-3 w-8 h-8 rounded-full bg-cambodia-500 text-white flex items-center justify-center shadow-glow animate-check-pop"
-          >
-            <Icon name="check" :size="16" />
-          </span>
-
-          <div class="absolute inset-x-0 bottom-0 p-4">
-            <div class="font-extrabold text-white text-xl leading-tight drop-shadow">{{ dest.name }}</div>
-            <div class="text-[13px] text-white/80 leading-snug mt-0.5">{{ dest.tagline || dest.region }}</div>
-            <div class="mt-3 flex items-center justify-between gap-2">
-              <span v-if="dest.days" class="text-[11.5px] font-semibold text-white/70">{{ dest.days }}</span>
-              <span
-                :class="[
-                  'ml-auto inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-bold transition-all duration-300',
-                  modelValue === dest.name
-                    ? 'bg-cambodia-500 text-white'
-                    : 'bg-white text-ink opacity-90 group-hover:opacity-100 group-hover:bg-sand-300'
-                ]"
-              >
-                {{ modelValue === dest.name ? 'Selected' : 'Choose' }}
-                <Icon :name="modelValue === dest.name ? 'check' : 'arrow-right'" :size="12" />
-              </span>
-            </div>
-          </div>
-        </button>
+          class="snap-start shrink-0 w-[220px] lg:w-auto h-[260px] sm:h-[280px]"
+          :title="dest.name"
+          :image="dest.image"
+          :emoji="dest.emoji"
+          :subtitle="dest.tagline"
+          :badge="dest.region"
+          :meta="dest.days"
+          :selected="modelValue === dest.name"
+          @select="selectDestination(dest.name)"
+        />
       </div>
     </div>
 
@@ -90,10 +46,10 @@
 
       <div v-if="selectedDest.days || selectedDest.bestSeason" class="mt-3 flex flex-wrap gap-2">
         <span v-if="selectedDest.days" class="chip !pointer-events-none !bg-ivory">
-          <Icon name="calendar" :size="13" />Stay {{ selectedDest.days }}
+          Stay {{ selectedDest.days }}
         </span>
         <span v-if="selectedDest.bestSeason" class="chip !pointer-events-none !bg-ivory">
-          <Icon name="sun" :size="13" />Best {{ selectedDest.bestSeason }}
+          Best {{ selectedDest.bestSeason }}
         </span>
       </div>
 
@@ -102,7 +58,6 @@
         class="mt-2.5 flex items-center gap-1.5 text-[13px] font-semibold"
         :class="seasonCheck.good ? 'text-cambodia-700' : 'text-sand-700'"
       >
-        <Icon :name="seasonCheck.good ? 'check-circle' : 'info'" :size="14" />
         {{ seasonCheck.text }}
       </p>
 
@@ -136,9 +91,8 @@
           Good to know
         </p>
         <ul class="space-y-1.5">
-          <li v-for="tip in selectedDest.tips" :key="tip" class="flex items-start gap-2 text-[13px] text-ink-soft leading-snug">
-            <Icon name="info" :size="14" class="flex-none mt-0.5 text-sand-600" />
-            <span>{{ tip }}</span>
+          <li v-for="tip in selectedDest.tips" :key="tip" class="relative pl-3.5 text-[13px] text-ink-soft leading-snug before:absolute before:left-0 before:top-[7px] before:w-1.5 before:h-1.5 before:rounded-full before:bg-sand-400">
+            {{ tip }}
           </li>
         </ul>
       </div>
@@ -149,7 +103,7 @@
         </p>
         <div class="flex flex-wrap gap-2">
           <span v-for="exp in suggestions.slice(0, 6)" :key="exp" class="chip !bg-ivory">
-            <span class="text-[13px]">✦</span>{{ exp }}
+            {{ exp }}
           </span>
         </div>
       </div>
@@ -188,6 +142,7 @@ import { POPULAR_DESTINATIONS, findDestination, FEES_CHECKED } from '../data/des
 import { isInSeason, monthName } from '../utils/season'
 import { getSuggestionsForDestination } from '../data/activities'
 import Emoji3D from './Emoji3D.vue'
+import PhotoChoiceCard from './PhotoChoiceCard.vue'
 import Icon from './icons/Icon.vue'
 
 const props = defineProps<{

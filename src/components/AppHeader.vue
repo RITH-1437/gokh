@@ -18,7 +18,6 @@
         </button>
 
         <span class="hidden md:inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-mute">
-          <span class="text-[15px]">🇰🇭</span>
           Explore Cambodia together
         </span>
 
@@ -28,7 +27,6 @@
           @click="emit('share')"
         >
           <Icon v-if="isSharing" name="loader" :size="16" class="animate-spin" />
-          <Icon v-else name="link" :size="16" />
           <span>Share</span>
         </button>
       </div>

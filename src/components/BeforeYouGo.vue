@@ -42,10 +42,7 @@
     <!-- Practical info -->
     <div class="grid sm:grid-cols-2 gap-3">
       <div v-for="block in info" :key="block.title" class="surface !rounded-2xl p-4">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-base" aria-hidden="true">{{ block.emoji }}</span>
-          <span class="font-bold text-ink text-sm">{{ block.title }}</span>
-        </div>
+        <p class="font-bold text-ink text-sm mb-2">{{ block.title }}</p>
         <ul class="space-y-1">
           <li v-for="line in block.lines" :key="line" class="text-[12.5px] text-ink-soft leading-snug">{{ line }}</li>
         </ul>

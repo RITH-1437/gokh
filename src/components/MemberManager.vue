@@ -79,7 +79,6 @@
       v-else
       class="surface !rounded-2xl px-6 py-8 flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left"
     >
-      <Emoji3D emoji="🧑‍🤝‍🧑" size="lg" shape="tile" float />
       <div class="flex-1 min-w-0">
         <p class="font-bold text-ink text-lg leading-snug">Who's joining the adventure?</p>
         <p class="text-sm text-ink-mute mt-1">Add your crew and choose a trip leader — the first traveler becomes the leader.</p>
@@ -118,7 +117,7 @@
         </button>
       </div>
       <p class="text-[12px] text-ink-mute mt-2">
-        The first traveler you add becomes the trip leader. 👑
+        The first traveler you add becomes the trip leader.
       </p>
     </div>
   </div>
@@ -130,7 +129,6 @@ import type { Member } from '../types/trip'
 import { validateMember } from '../utils/validation'
 import { useToasts } from '../composables/useToasts'
 import Avatar from './Avatar.vue'
-import Emoji3D from './Emoji3D.vue'
 import Icon from './icons/Icon.vue'
 
 const props = defineProps<{
