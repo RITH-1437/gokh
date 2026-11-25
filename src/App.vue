@@ -513,6 +513,15 @@ const mobileSummary = computed(() => {
             <p>Plan it. Pack it. Go.</p>
             <p>Weather by Open-Meteo · Some photos from Wikimedia Commons</p>
             <p>Fees and travel advice checked Nov 2026 — always confirm before you go.</p>
+            <p>
+              Built by
+              <a
+                href="https://rith-1437.github.io/protfolio_professional_done/"
+                target="_blank"
+                rel="author noopener"
+                class="text-white/80 underline underline-offset-2 hover:text-white"
+              >RIN Nairith</a>
+            </p>
           </div>
         </div>
       </footer>
