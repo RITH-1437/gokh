@@ -1,6 +1,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import type { Trip, Member, Currency } from '../types/trip'
 import { readTripFromUrl } from '../utils/encoding'
+import type { ShareLinkInfo } from '../utils/encoding'
 import { generateDateRange, isValidDateRange, daysBetweenInclusive, MAX_TRIP_DAYS } from '../utils/dates'
 import { convertCurrency } from '../utils/currency'
 import { createId } from '../utils/id'
@@ -51,6 +52,8 @@ export const useTrip = (options: UseTripOptions = {}) => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const loadedFromUrl = ref(false)
+  /** Fingerprint/date of the share link the current trip was opened from. */
+  const sharedLink = ref<ShareLinkInfo | null>(null)
   const hasUnsavedEdits = ref(false)
   let suppressEditTrack = false
 
@@ -62,8 +65,10 @@ export const useTrip = (options: UseTripOptions = {}) => {
     suppressEditTrack = false
   }
 
-  // Load a shared trip from `?trip=`. Resolves to 'invalid' for a broken or
-  // tampered link (the param is removed either way so a refresh is clean).
+  // Load a shared trip from `#e.…` (or a legacy `?trip=`). Resolves to
+  // 'invalid' for a broken or tampered link. The link is removed from the
+  // address bar either way so a refresh is clean and it doesn't linger in
+  // history.
   const loadTripFromUrl = async (): Promise<TripLoadStatus> => {
     try {
       const result = await readTripFromUrl()
@@ -74,6 +79,7 @@ export const useTrip = (options: UseTripOptions = {}) => {
         return 'invalid'
       }
       loadedFromUrl.value = true
+      sharedLink.value = result.link
       await replaceTrip(result.trip)
       return 'loaded'
     } catch (err) {
@@ -107,6 +113,7 @@ export const useTrip = (options: UseTripOptions = {}) => {
   const clearSharedTripFlag = () => {
     loadedFromUrl.value = false
     hasUnsavedEdits.value = false
+    sharedLink.value = null
   }
 
   // Track edits made after a trip was loaded from a shared URL
@@ -268,6 +275,7 @@ export const useTrip = (options: UseTripOptions = {}) => {
     trip.value = createEmptyTrip()
     loadedFromUrl.value = false
     hasUnsavedEdits.value = false
+    sharedLink.value = null
     if (options.persist) clearSavedTrip()
   }
 
@@ -286,6 +294,7 @@ export const useTrip = (options: UseTripOptions = {}) => {
     isLoading,
     error,
     loadedFromUrl,
+    sharedLink,
     hasUnsavedEdits,
     loadTripFromUrl,
     restoreSavedTrip,

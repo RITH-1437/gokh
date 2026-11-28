@@ -35,6 +35,7 @@ const {
   loadTripFromUrl,
   restoreSavedTrip,
   loadedFromUrl,
+  sharedLink,
   hasUnsavedEdits,
   clearSharedTripFlag,
   addMember,
@@ -56,7 +57,7 @@ const {
   clear: clearWeather
 } = useWeather()
 
-const { shareTrip, error: shareError } = useTripShare()
+const { shareTrip, shareInfo, error: shareError } = useTripShare()
 const toasts = useToasts()
 
 const isSharing = ref(false)
@@ -84,16 +85,35 @@ watch(
   }
 )
 
+const showBrokenLinkToast = () =>
+  toasts.error('This share link is broken', 'It may have been cut off or changed when copied. Ask for the link again.', 6000)
+
 // On start-up a shared link wins; otherwise restore the local draft.
 onMounted(async () => {
   const status = await loadTripFromUrl()
-  if (status === 'invalid') {
-    toasts.error('This share link is broken', 'It may have been cut off when copied. Ask for the link again.', 6000)
-  }
+  if (status === 'invalid') showBrokenLinkToast()
   if (status !== 'loaded' && (await restoreSavedTrip())) {
     toasts.info('Welcome back', 'We restored the trip you were planning.')
   }
 })
+
+// Share links live in the URL fragment, and pasting one into a tab that already
+// has GoKH open only fires `hashchange` (no reload) — load it here too.
+const onHashChange = async () => {
+  if (!window.location.hash.startsWith('#e.')) return
+  if (hasUnsavedEdits.value && !window.confirm('Open the shared trip? Your current changes will be replaced.')) {
+    window.history.replaceState({}, '', window.location.pathname)
+    return
+  }
+  const status = await loadTripFromUrl()
+  if (status === 'invalid') showBrokenLinkToast()
+  if (status === 'loaded') window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+onMounted(() => window.addEventListener('hashchange', onHashChange))
+onUnmounted(() => window.removeEventListener('hashchange', onHashChange))
+
+const formatSharedAt = (d: Date) =>
+  d.toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
 
 // Fetch weather when trip context changes
 watch(
@@ -214,7 +234,8 @@ const handleShare = async () => {
   const ok = await shareTrip(trip.value)
   isSharing.value = false
   if (ok) {
-    toasts.success('Trip link copied', 'Send it to your friends — they can open and keep planning.')
+    const id = shareInfo.value ? ` Link ID ${shareInfo.value.id}.` : ''
+    toasts.success('Trip link copied', `Send it to your friends — they can open and keep planning.${id}`)
   } else {
     toasts.error("Couldn't copy the link", shareError.value || 'Please try again.')
   }
@@ -287,6 +308,9 @@ const mobileSummary = computed(() => {
           </template>
           <template v-else>
             <span class="font-bold">Shared trip.</span>
+            <span v-if="sharedLink" class="text-white/80">
+              Link <span class="font-mono font-semibold text-white">{{ sharedLink.id }}</span><template v-if="sharedLink.sharedAt"> · created {{ formatSharedAt(sharedLink.sharedAt) }}</template> —
+            </span>
             <span class="text-white/80"> You're viewing a trip someone shared — edit to make it yours.</span>
           </template>
         </span>

@@ -8,15 +8,18 @@ handling) do not apply. The realistic risks are:
 
 | Risk | Mitigation |
 | --- | --- |
-| **Crafted share links** (`?trip=`) crashing or abusing the app | Every decoded payload passes through `sanitizeTrip` (`src/utils/tripSchema.ts`): types checked, enums whitelisted, strings length-capped, dates must be real `YYYY-MM-DD` values, ranges capped at 90 days, ≤50 travelers, ≤50 activities/day, amounts finite and non-negative, contributions only for existing travelers, exactly one leader. Payloads >200 KB are rejected before decoding. Saved drafts go through the same function. |
+| **Crafted share links** (`#e.…`, legacy `?trip=`) crashing or abusing the app | Every decoded payload passes through `sanitizeTrip` (`src/utils/tripSchema.ts`): types checked, enums whitelisted, strings length-capped, dates must be real `YYYY-MM-DD` values, ranges capped at 90 days, ≤50 travelers, ≤50 activities/day, amounts finite and non-negative, contributions only for existing travelers, exactly one leader. Payloads >200 KB are rejected before decoding and inflation stops at 4 MB (zip-bomb guard). A valid AES-GCM tag proves only that the link is intact, not that it is trustworthy, so v2 links are sanitized too. Saved drafts go through the same function. |
 | **XSS** | No `v-html`/`innerHTML`; all user text is rendered via Vue interpolation (escaped). Image `src` values come only from bundled assets or fixed Wikimedia Commons URLs in the catalog (never from share-link data). Strict CSP (below). |
-| **Trip data leaking via Referer** | `Referrer-Policy: no-referrer`; the `trip` param is removed from the URL after loading. |
+| **Trip data leaking via Referer / server logs / link previews** | v2 links keep the trip in the URL fragment, which browsers never send to servers or in `Referer`; `Referrer-Policy: no-referrer`; the link is removed from the address bar after loading and is not written there when sharing. |
 | **Clickjacking** | `X-Frame-Options: DENY` and CSP `frame-ancestors 'none'`. |
 | **Third-party images** | Wikimedia photos are requested by visitors' browsers; `Referrer-Policy: no-referrer` means Wikimedia sees only the IP, not the page or trip. Failed loads fall back to an emoji tile. |
 | **Supply chain** | One runtime dependency (`vue`). CI runs `npm audit --omit=dev --audit-level=high`. |
 
 **Privacy note:** a share link contains the whole trip (traveler names, budget).
-Anyone holding the link can read it — treat it like the trip itself. Drafts are
+It is encrypted, but the key is part of the link, so anyone holding the full link
+can read it — treat it like the trip itself. Encryption keeps the trip from being
+read in plain sight and makes tampering/truncation detectable; it is not access
+control. Drafts are
 stored only in the browser's `localStorage`.
 
 ## HTTP headers (vercel.json)

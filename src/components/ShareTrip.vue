@@ -26,6 +26,11 @@
         Trip link copied — send it to your friends
       </div>
 
+      <p v-if="isReady && shareInfo" class="mt-2 text-[12px] text-white/70">
+        Link ID <span class="font-mono font-semibold text-white">{{ shareInfo.id }}</span>
+        — your crew sees the same ID when they open it.
+      </p>
+
       <!-- Share link (manual copy) -->
       <div v-if="shareUrl && isReady && !isCopied" class="mt-4 w-full max-w-sm">
         <div class="flex gap-2">
@@ -46,7 +51,7 @@
           How does sharing work?
         </summary>
         <p class="mt-2 text-[12.5px] text-white/75 leading-relaxed bg-white/10 rounded-xl px-3.5 py-3">
-          Your whole trip lives inside the link — no account or server needed. Anyone with it can view the trip and keep planning together.
+          Your whole trip lives inside the link — no account or server needed. It's compressed and encrypted, and the trip part of the link is never sent to any server. Anyone you give the full link to can view the trip and keep planning together. A cut-off or edited link won't open, and each link has an ID so everyone can check they have the latest one.
         </p>
       </details>
     </div>
@@ -68,7 +73,7 @@ const emit = defineEmits<{
   completeTrip: []
 }>()
 
-const { shareUrl, isCopied, isSharing, error: shareError, shareTrip, copyToClipboard } = useTripShare()
+const { shareUrl, shareInfo, isCopied, isSharing, error: shareError, shareTrip, copyToClipboard } = useTripShare()
 const { success, error } = useToasts()
 
 const isReady = computed(
@@ -100,7 +105,8 @@ const handlePrimary = async () => {
   }
   const ok = await shareTrip(props.trip)
   if (ok) {
-    success('Trip link copied', 'Send it to your friends — they can open and keep planning.')
+    const id = shareInfo.value ? ` Link ID ${shareInfo.value.id}.` : ''
+    success('Trip link copied', `Send it to your friends — they can open and keep planning.${id}`)
   } else if (shareError.value) {
     error('Something went wrong', shareError.value)
   }

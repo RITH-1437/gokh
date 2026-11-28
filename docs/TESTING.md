@@ -15,7 +15,8 @@ npm run check         # typecheck + tests + build (same as CI)
 | File | Covers |
 | --- | --- |
 | `src/utils/tripSchema.test.ts` | Sanitizer: rejecting non-trips, repairing missing fields, malformed itinerary, leader rules, duplicate members/ids, bad contributions, enum fallbacks, invalid/over-long dates, length caps, time formats, checklist ids |
-| `src/utils/encoding.test.ts` | Share-link round trip (Khmer + emoji), garbage/oversized/truncated links, none/invalid/loaded detection |
+| `src/utils/encoding.test.ts` | v2 round trip (Khmer + emoji), encryption/fresh key per link, link ID matches for sender and receiver, tamper/truncation rejected, zip-bomb cap, v1 `z.` and v0 legacy links still open, fragment vs query detection |
+| `src/composables/useTripShare.test.ts` | Copied link = shown link; **regression:** sharing no longer writes the link into the address bar (refresh used to overwrite later edits) |
 | `src/utils/utils.test.ts` | Date helpers, amount parsing, currency conversion/formatting, validation messages, mixed-currency funding |
 | `src/composables/useTrip.test.ts` | Member/leader rules, unique ids, itinerary generation, **regression:** invalid range no longer wipes activities, >90-day guard, budget totals, shared-link loading and edit tracking, broken links, autosave/restore, reset |
 | `src/composables/useWeather.test.ts` | Response mapping, no guessing for unknown places, 14-day window, API failure, **regression:** stale response can't overwrite newer one |

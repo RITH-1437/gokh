@@ -1,18 +1,22 @@
 import { ref } from 'vue'
 import type { Trip } from '../types/trip'
-import { generateTripUrl, extractTripFromUrl } from '../utils/encoding'
+import { createShareLink, extractTripFromUrl } from '../utils/encoding'
+import type { ShareLinkInfo } from '../utils/encoding'
 
 export const useTripShare = () => {
   const shareUrl = ref('')
+  /** Fingerprint + time of the last link created, so the sender can quote it. */
+  const shareInfo = ref<ShareLinkInfo | null>(null)
   const isCopied = ref(false)
   const isSharing = ref(false)
   const error = ref<string | null>(null)
 
   const generateShareUrl = async (trip: Trip): Promise<string> => {
     try {
-      const url = await generateTripUrl(trip)
-      shareUrl.value = url
-      return url
+      const link = await createShareLink(trip)
+      shareUrl.value = link.url
+      shareInfo.value = { id: link.id, sharedAt: link.sharedAt }
+      return link.url
     } catch (err) {
       error.value = 'Failed to generate share URL'
       console.error(err)
@@ -53,10 +57,11 @@ export const useTripShare = () => {
     error.value = null
 
     try {
+      // Build the link exactly once. It is deliberately NOT written into the
+      // address bar: a refresh would then reload this snapshot as a "shared
+      // trip" and overwrite any edits made after sharing.
       const url = await generateShareUrl(trip)
-
-      // Update browser URL
-      await updateBrowserUrl(trip)
+      if (!url) return false
 
       // Always copy to clipboard. The native share sheet (navigator.share)
       // opens a small system modal that can hang the UI on desktop, tablet
@@ -81,17 +86,9 @@ export const useTripShare = () => {
     }
   }
 
-  const updateBrowserUrl = async (trip: Trip) => {
-    try {
-      const url = await generateTripUrl(trip)
-      window.history.replaceState({}, '', url)
-    } catch (err) {
-      console.error('Failed to update browser URL:', err)
-    }
-  }
-
   return {
     shareUrl,
+    shareInfo,
     isCopied,
     isSharing,
     error,
@@ -99,6 +96,5 @@ export const useTripShare = () => {
     copyToClipboard,
     shareTrip,
     loadSharedTrip,
-    updateBrowserUrl,
   }
 }

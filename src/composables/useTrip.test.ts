@@ -125,6 +125,19 @@ describe('shared links', () => {
     expect(t.hasUnsavedEdits.value).toBe(true)
   })
 
+  it('loads a v2 link from the URL fragment and removes it from the address bar', async () => {
+    const shared = useTrip()
+    shared.trip.value.tripName = 'Fragment'
+    shared.trip.value.destination = 'Kep'
+    window.history.replaceState({}, '', `/#${await encodeTripToUrl(shared.trip.value)}`)
+
+    const t = useTrip()
+    expect(await t.loadTripFromUrl()).toBe('loaded')
+    expect(t.trip.value.tripName).toBe('Fragment')
+    expect(window.location.hash).toBe('')
+    expect(t.sharedLink.value?.id).toMatch(/^\w{4}-\w{4}$/)
+  })
+
   it('reports a broken link and leaves the planner empty', async () => {
     window.history.replaceState({}, '', '/?trip=broken')
     const t = useTrip()

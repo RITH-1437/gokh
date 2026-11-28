@@ -21,7 +21,8 @@ src/
     useAnimatedNumber.ts  rAF number tweening for budget figures
   utils/
     tripSchema.ts         sanitizeTrip(): trust boundary for untrusted trip data
-    encoding.ts           Trip <-> URL-safe base64 share links
+    encoding.ts           Trip <-> share links (packed, compressed, encrypted)
+    tripPack.ts           Compact positional trip form used by v2 links
     storage.ts            localStorage draft persistence (guarded)
     dates.ts              Local-time ISO date helpers, MAX_TRIP_DAYS
     currency.ts           USD/KHR conversion, formatting, safe amount parsing
@@ -58,14 +59,40 @@ localStorage▶│ loadSavedTrip  → sanitizeTrip     │──▶ trip (ref<Tr
 
 ## Share-link format
 
-`https://<origin>/?trip=<payload>` where `payload` is the trip JSON, UTF-8
-encoded, base64, made URL-safe (`+`→`-`, `/`→`_`, padding stripped). Links are
-capped at 200 KB and every decoded payload passes through `sanitizeTrip`, which
-rebuilds a well-formed `Trip` (see [SECURITY.md](SECURITY.md)). After loading,
-the `trip` parameter is removed from the address bar.
+New links (v2, written since Nov 2026):
 
-The format is unchanged from earlier versions, so old links still open
-(`checklist` is optional; links without it load with an empty checklist).
+```
+https://<origin>/#e.<payload>
+payload = base64url( key[16 bytes] ‖ AES-GCM-128( deflate-raw( packTrip(trip) ) ) )
+```
+
+- **Packed** (`src/utils/tripPack.ts`): a positional array instead of keyed JSON;
+  UUIDs are dropped (regenerated on load), contributions reference travelers by
+  index, itinerary dates are derived from the first day. Typical links are
+  ~300–400 characters, 57–80% shorter than v1.
+- **Encrypted** with a fresh random key per link (Web Crypto, no deps). The key
+  travels inside the link, so anyone with the full link can open it — the point
+  is that the trip is not readable in plain sight, and that AES-GCM's
+  authentication tag makes a truncated or edited link fail cleanly as "broken".
+- **Fragment, not query**: `#…` is never sent to the server, so the trip stays out
+  of hosting logs and away from chat link-preview crawlers.
+- **Link ID**: `linkIdFor(payload)` is an 8-char Crockford-base32 SHA-256
+  fingerprint (`K7QX-2M9P`). The sender sees it after sharing and receivers see
+  it in the "Shared trip" banner together with the link's creation time, so a
+  group can confirm everyone has the same, latest link. Nothing is tracked.
+
+Older formats are still decoded — never remove them:
+
+| Version | Shape |
+| --- | --- |
+| v1 | `?trip=z.<base64url(deflate-raw(JSON))>` |
+| v0 | `?trip=<base64url(JSON)>` |
+
+Every decoded payload passes through `sanitizeTrip`. Payloads are capped at
+200 KB encoded and 4 MB inflated (zip-bomb guard). After loading, the link is
+removed from the address bar. Sharing does **not** write the link into the
+address bar (a refresh would otherwise re-open that snapshot over later edits).
+Pasting a link into an already-open tab is handled via `hashchange`.
 
 ## Persistence
 

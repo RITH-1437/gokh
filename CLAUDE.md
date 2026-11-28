@@ -8,7 +8,7 @@ Claude Code and other Claude-based agents: read the full operating guide here.
 
 GoKH is a **client-only Vue 3 + TypeScript + Vite + Tailwind** trip planner.
 No backend, database, auth or API keys. Trip data lives in `localStorage` and is
-shared via a `?trip=<url-safe-base64>` link.
+shared via a `#e.<payload>` link (compressed + encrypted; legacy `?trip=` links still open).
 
 ```bash
 npm run dev          # dev server (localhost:5173)
@@ -21,11 +21,11 @@ Key rules:
 
 - Follow the existing style: Vue `<script setup lang="ts">`, single quotes, no
   semicolons, 2-space indent, Tailwind utility classes.
-- All incoming trip data (`?trip=`, `localStorage`) must pass through
+- All incoming trip data (share links, `localStorage`) must pass through
   `sanitizeTrip` in `src/utils/tripSchema.ts`.
 - Domain rules (leader, contributions, itinerary dates) live in
   `src/composables/useTrip.ts`. Don't duplicate them in components.
-- Never change the share-link format; never add `v-html` or new runtime deps.
+- Never break old share links (new formats get a new prefix); never add `v-html` or new runtime deps.
 - Add a regression test for every bug fix, then run `npm run check`.
 - Commit with Conventional Commits; don't commit `dist/`, `node_modules/` or
   `*.tsbuildinfo`, and don't revert unrelated working-tree changes.
