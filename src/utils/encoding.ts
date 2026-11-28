@@ -1,17 +1,21 @@
 import type { Trip } from '../types/trip'
 import { sanitizeTrip } from './tripSchema'
-import { packTrip, unpackTrip } from './tripPack'
+import { unpackTrip } from './tripPack'
+import { readTripBinary, writeTripBinary } from './tripBinary'
 
 // ─── Share-link formats ──────────────────────────────────────────────────────
 //
-//   v2  https://<origin>/#e.<payload>       (current, written by the app)
-//       payload = base64url( key[16] ‖ AES-GCM( deflate( packTrip(trip) ) ) )
+//   v3  https://<origin>/#f.<payload>       (current, written by the app)
+//       payload = base64url( key[16] ‖ AES-GCM-64( mode ‖ body ) )
+//       body    = writeTripBinary(trip), or deflate of it when that is smaller (mode 1)
+//   v2  https://<origin>/#e.<payload>       (decode only)
+//       payload = base64url( key[16] ‖ AES-GCM( deflate( JSON(packTrip) ) ) )
 //   v1  https://<origin>/?trip=z.<payload>  (decode only)
 //       payload = base64url( deflate( JSON(trip) ) )
 //   v0  https://<origin>/?trip=<payload>    (decode only)
 //       payload = base64url( JSON(trip) )
 //
-// v2 lives in the URL *fragment*, which browsers never send to a server, so the
+// v2/v3 live in the URL *fragment*, which browsers never send to a server, so the
 // trip is not written to hosting logs or fetched by chat link-preview bots.
 // It is encrypted with a fresh random 128-bit key carried inside the link:
 // anyone holding the full link can open it (that is the point of sharing), but
@@ -26,10 +30,17 @@ const MAX_ENCODED_LENGTH = 200_000
 // of MB. Far above any trip sanitizeTrip would accept.
 const MAX_DECODED_BYTES = 4_000_000
 
+const COMPACT_PREFIX = 'f.'
 const ENCRYPTED_PREFIX = 'e.'
 const COMPRESSED_PREFIX = 'z.'
 const KEY_BYTES = 16
 const GCM_TAG_BYTES = 16
+// v3 uses a 64-bit tag: still a 1-in-18-quintillion chance that a damaged link
+// slips through, and 11 characters shorter. (The tag is for integrity — anyone
+// with the link has the key anyway.)
+const COMPACT_TAG_BITS = 64
+const MODE_RAW = 0
+const MODE_DEFLATE = 1
 // A fixed IV is safe here because every link uses a brand-new random key, so a
 // (key, IV) pair is never reused. It saves 16 characters per link.
 const IV = new Uint8Array(12)
@@ -126,15 +137,37 @@ export const linkIdFor = async (payload: string): Promise<string> => {
   return `${id.slice(0, 4)}-${id.slice(4)}`
 }
 
-// ─── v2: packed + compressed + encrypted ─────────────────────────────────────
+// ─── v3: binary + catalog phrases + encrypted (current) ─────────────────────
 
-const encodeV2 = async (trip: Trip, now: Date): Promise<string> => {
-  const json = new TextEncoder().encode(JSON.stringify(packTrip(trip, now)))
-  const compressed = await deflate(json)
+const encodeV3 = async (trip: Trip, now: Date): Promise<string> => {
+  const body = concat([writeTripBinary(trip, now)])
+  const deflated = await deflate(body)
+  const plain = deflated.length < body.length
+    ? concat([Uint8Array.of(MODE_DEFLATE), deflated])
+    : concat([Uint8Array.of(MODE_RAW), body])
   const key = crypto.getRandomValues(new Uint8Array(KEY_BYTES))
-  const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: IV }, await importKey(key, 'encrypt'), compressed)
-  return ENCRYPTED_PREFIX + bytesToBase64Url(concat([key, new Uint8Array(cipher)]))
+  const cipher = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: IV, tagLength: COMPACT_TAG_BITS },
+    await importKey(key, 'encrypt'),
+    plain,
+  )
+  return COMPACT_PREFIX + bytesToBase64Url(concat([key, new Uint8Array(cipher)]))
 }
+
+const decodeV3 = async (payload: string): Promise<{ raw: unknown; sharedAt: Date | null }> => {
+  const bytes = base64UrlToBytes(payload)
+  if (bytes.length < KEY_BYTES + COMPACT_TAG_BITS / 8 + 1) throw new Error('Share link too short')
+  const key = await importKey(bytes.slice(0, KEY_BYTES), 'decrypt')
+  const plain = new Uint8Array(
+    await crypto.subtle.decrypt({ name: 'AES-GCM', iv: IV, tagLength: COMPACT_TAG_BITS }, key, bytes.slice(KEY_BYTES)),
+  )
+  const body = plain.slice(1)
+  if (plain[0] === MODE_RAW) return readTripBinary(body)
+  if (plain[0] === MODE_DEFLATE) return readTripBinary(await inflate(body))
+  throw new Error('Unknown share link mode')
+}
+
+// ─── v2: packed JSON + compressed + encrypted (decode only) ─────────────────
 
 const decodeV2 = async (payload: string): Promise<{ raw: unknown; sharedAt: Date | null }> => {
   const bytes = base64UrlToBytes(payload)
@@ -157,10 +190,10 @@ const decodeV0 = (payload: string): unknown => JSON.parse(new TextDecoder().deco
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-/** Encode a trip to a v2 link payload (`e.…`). Returns '' on failure. */
+/** Encode a trip to a v3 link payload (`f.…`). Returns '' on failure. */
 export const encodeTripToUrl = async (trip: Trip, now: Date = new Date()): Promise<string> => {
   try {
-    return await encodeV2(trip, now)
+    return await encodeV3(trip, now)
   } catch (error) {
     console.error('Error encoding trip:', error)
     return ''
@@ -174,7 +207,9 @@ export const decodeShareLink = async (encoded: string): Promise<{ trip: Trip; li
 
     let raw: unknown
     let sharedAt: Date | null = null
-    if (encoded.startsWith(ENCRYPTED_PREFIX)) {
+    if (encoded.startsWith(COMPACT_PREFIX)) {
+      ;({ raw, sharedAt } = await decodeV3(encoded.slice(COMPACT_PREFIX.length)))
+    } else if (encoded.startsWith(ENCRYPTED_PREFIX)) {
       ;({ raw, sharedAt } = await decodeV2(encoded.slice(ENCRYPTED_PREFIX.length)))
     } else if (encoded.startsWith(COMPRESSED_PREFIX)) {
       raw = await decodeV1(encoded.slice(COMPRESSED_PREFIX.length))
@@ -213,10 +248,15 @@ export type UrlTripResult =
   | { status: 'invalid' }
   | { status: 'loaded'; trip: Trip; link: ShareLinkInfo }
 
-/** Find a link payload in `#e.…` (v2) or `?trip=…` (v1/v0, and v2 for safety). */
-const findPayload = (search: string, hash: string): string | null => {
+/** True for a URL fragment that carries a share link (`#f.…` / `#e.…`). */
+export const isShareFragment = (hash: string): boolean => {
   const fragment = hash.replace(/^#/, '')
-  if (fragment.startsWith(ENCRYPTED_PREFIX)) return fragment
+  return fragment.startsWith(COMPACT_PREFIX) || fragment.startsWith(ENCRYPTED_PREFIX)
+}
+
+/** Find a link payload in the fragment (v3/v2) or `?trip=…` (v1/v0, and any version for safety). */
+const findPayload = (search: string, hash: string): string | null => {
+  if (isShareFragment(hash)) return hash.replace(/^#/, '')
   return new URLSearchParams(search).get('trip') || null
 }
 

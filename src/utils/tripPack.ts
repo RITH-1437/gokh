@@ -1,8 +1,9 @@
-import type { Trip } from '../types/trip'
 import { isValidISODate, parseISODate } from './dates'
 import { createId } from './id'
 
-// Compact, positional form of a Trip used inside v2 ("e.") share links.
+// Decoder for the positional trip form inside v2 ("e.") share links.
+// v2 links are no longer written (see tripBinary.ts for v3) but links already
+// sent to people must keep opening, so this stays — decode only.
 //
 // Plain JSON repeats every key ("description", "startTime"…) and carries a
 // 36-char UUID for every traveler and activity. None of that is needed to
@@ -35,48 +36,12 @@ export type PackedTrip = [
   checklist: string[],
 ]
 
-const trimTrailingEmpty = (values: string[]): string[] => {
-  let end = values.length
-  while (end > 0 && !values[end - 1]) end--
-  return values.slice(0, end)
-}
-
 const pad = (n: number) => String(n).padStart(2, '0')
 
 const addDaysISO = (iso: string, days: number): string => {
   const d = parseISODate(iso)
   d.setDate(d.getDate() + days)
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
-
-export const packTrip = (trip: Trip, sharedAt: Date = new Date()): PackedTrip => {
-  const memberIndex = new Map(trip.members.map((m, i) => [m.id, i]))
-  return [
-    PACK_VERSION,
-    Math.floor(sharedAt.getTime() / 1000),
-    trip.tripName,
-    trip.destination,
-    trip.startDate,
-    trip.endDate,
-    trip.members.map(m => m.name),
-    Math.max(0, trip.members.findIndex(m => m.role === 'leader')),
-    [trip.transportation.type, trip.transportation.note ?? ''],
-    [trip.accommodation.type, trip.accommodation.name ?? ''],
-    [
-      trip.budget.total,
-      trip.budget.currency,
-      trip.budget.contributions
-        .filter(c => memberIndex.has(c.memberId))
-        .map((c): PackedContribution => [memberIndex.get(c.memberId)!, c.amount, c.currency]),
-    ],
-    trip.itinerary[0]?.date ?? '',
-    trip.itinerary.map(day =>
-      day.activities.map(a =>
-        trimTrailingEmpty([a.name, a.description ?? '', a.startTime ?? '', a.endTime ?? '']),
-      ),
-    ),
-    trip.checklist ?? [],
-  ]
 }
 
 export interface UnpackedTrip {

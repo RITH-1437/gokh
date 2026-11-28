@@ -123,3 +123,9 @@ Border advice, entry fees and opening times change. Before each travel season
 3. Run `npm test` — `src/data/data.test.ts` verifies every destination has
    coordinates inside Cambodia, suggestions, stay length and season, and that
    suggestion lists have no duplicates.
+4. New destination names, suggested trip names, activities or route stops:
+   **append** them to the end of `SHARE_DICTIONARY` in
+   `src/utils/shareDictionary.ts` so share links stay short
+   (`shareDictionary.test.ts` lists anything missing). Never edit, reorder or
+   delete existing entries, even when the catalog text changes, because old
+   share links refer to them by position.

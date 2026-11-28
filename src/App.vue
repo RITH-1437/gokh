@@ -21,6 +21,7 @@ import BeforeYouGo from './components/BeforeYouGo.vue'
 import { useTrip } from './composables/useTrip'
 import { useWeather } from './composables/useWeather'
 import { useTripShare } from './composables/useTripShare'
+import { isShareFragment } from './utils/encoding'
 import { useToasts } from './composables/useToasts'
 import { findDestination } from './data/destinations'
 import { ROUTE_TEMPLATES, planRouteTemplate } from './data/routes'
@@ -100,7 +101,7 @@ onMounted(async () => {
 // Share links live in the URL fragment, and pasting one into a tab that already
 // has GoKH open only fires `hashchange` (no reload) — load it here too.
 const onHashChange = async () => {
-  if (!window.location.hash.startsWith('#e.')) return
+  if (!isShareFragment(window.location.hash)) return
   if (hasUnsavedEdits.value && !window.confirm('Open the shared trip? Your current changes will be replaced.')) {
     window.history.replaceState({}, '', window.location.pathname)
     return

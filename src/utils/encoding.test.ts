@@ -51,7 +51,7 @@ const legacyZ = async (t: Trip) => `z.${b64url(await deflateRaw(new TextEncoder(
 describe('share link encoding', () => {
   it('round-trips a trip including Khmer text and emoji', async () => {
     const encoded = await encodeTripToUrl(trip)
-    expect(encoded).toMatch(/^e\.[A-Za-z0-9_-]+$/) // encrypted prefix + URL-safe, no padding
+    expect(encoded).toMatch(/^f\.[A-Za-z0-9_-]+$/) // compact prefix + URL-safe, no padding
     expect(withoutIds(await decodeTripFromUrl(encoded))).toEqual(withoutIds(trip))
   })
 
@@ -72,7 +72,31 @@ describe('share link encoding', () => {
   it('is much shorter than the previous z. format', async () => {
     const encoded = await encodeTripToUrl(bigTrip)
     const v1 = await legacyZ(bigTrip)
-    expect(encoded.length).toBeLessThan(v1.length * 0.75)
+    expect(encoded.length).toBeLessThan(v1.length * 0.3)
+  })
+
+  // Shape of the real 20-day Kampot link that was 379 characters in v2.
+  it('a 20-day trip of catalog activities fits in a short link', async () => {
+    const picks = ['Bokor National Park', 'Pepper Farm Tour', 'Sunset River Cruise', 'Salt Fields', 'Night Market']
+    const long: Trip = {
+      ...trip,
+      members: [{ id: 'm1', name: 'Dara', role: 'leader' }],
+      transportation: { type: 'van', note: '' },
+      accommodation: { type: 'guesthouse', name: '' },
+      budget: { total: 1000, currency: 'USD', contributions: [] },
+      checklist: ['visa', 'e-arrival', 'cash', 'rides', 'clothes', 'advice'],
+      tripName: 'Bokor Hill Station Trip',
+      startDate: '2026-12-03',
+      endDate: '2026-12-22',
+      itinerary: Array.from({ length: 20 }, (_, d) => ({
+        dayNumber: d + 1,
+        date: `2026-12-${String(3 + d).padStart(2, '0')}`,
+        activities: d === 8 ? [] : [{ id: `a${d}`, name: picks[d % picks.length], description: '', startTime: '', endTime: '' }],
+      })),
+    }
+    const url = await generateTripUrl(long, 'https://gokh.vercel.app')
+    expect(url.length).toBeLessThanOrEqual(130) // was 379 as an e. link
+    expect(withoutIds(await decodeTripFromUrl(new URL(url).hash.slice(1)))?.itinerary).toEqual(withoutIds(long)?.itinerary)
   })
 
   it('encrypts: trip text is not readable from the link, and each link uses a new key', async () => {
@@ -83,8 +107,8 @@ describe('share link encoding', () => {
   })
 
   it('builds a fragment link on the given origin with a link id', async () => {
-    expect(await generateTripUrl(trip, 'https://gokh.example')).toMatch(/^https:\/\/gokh\.example\/#e\.[A-Za-z0-9_-]+$/)
-    const now = new Date('2026-11-28T03:04:05Z')
+    expect(await generateTripUrl(trip, 'https://gokh.example')).toMatch(/^https:\/\/gokh\.example\/#f\.[A-Za-z0-9_-]+$/)
+    const now = new Date('2026-11-28T03:04:00Z') // links keep the minute
     const link = await createShareLink(trip, 'https://gokh.example', now)
     expect(link.id).toMatch(/^[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$/)
     // Receiver sees the same id and creation time as the sender.
@@ -124,11 +148,29 @@ describe('share link encoding', () => {
     expect(result.status).toBe('loaded')
   })
 
-  it('reads v2 links from the fragment and ignores unrelated fragments', async () => {
+  it('reads links from the fragment and ignores unrelated fragments', async () => {
     const encoded = await encodeTripToUrl(trip)
     expect((await readTripFromUrl('', `#${encoded}`)).status).toBe('loaded')
     expect(await readTripFromUrl('', '#share-section')).toEqual({ status: 'none' })
+    expect(await readTripFromUrl('', '#f.garbage')).toEqual({ status: 'invalid' })
     expect(await readTripFromUrl('', '#e.garbage')).toEqual({ status: 'invalid' })
+  })
+
+  it('backward-compat: e. links from the previous release still open', async () => {
+    // Real link produced by the v2 encoder before v3 shipped. Never regenerate it.
+    const v2 =
+      'e.xCzuEUW-fxHgrxZJrO0IxXBq3xL-SgB8HrlFu6F-EQ4-xnHM5p4l3-bFJEUGm0EFr92Oi7Y5rgaw2VxChEPOcRN2nWr5Lk2JaragtrtC5JxKpjJLkT-jd6-RTXK_aOoeYZIoLPFGYgsCJShM7J1O6FBQRHkmIjfxK_t1XlMqfVPl093T9y-E279n7nJOwcGmkQMuDZyMQkdoYtghp0q3c_GM5SbWcAUpMCKYgg6DbRk8hqZJW70'
+    const opened = await readTripFromUrl('', `#${v2}`)
+    expect(opened.status).toBe('loaded')
+    if (opened.status !== 'loaded') return
+    const t = opened.trip
+    expect(opened.link.sharedAt).toEqual(new Date('2026-11-28T08:00:00Z'))
+    expect([t.tripName, t.destination, t.startDate, t.endDate]).toEqual(['Kampot Riverside Trip', 'Kampot', '2026-12-10', '2026-12-11'])
+    expect(t.members.map(m => [m.name, m.role])).toEqual([['Sokha', 'member'], ['Dara', 'leader']])
+    expect(t.budget.contributions).toEqual([{ memberId: t.members[1].id, amount: 100, currency: 'USD' }])
+    expect(t.itinerary[0].activities[0]).toMatchObject({ name: 'Pepper Farm Tour', startTime: '09:00' })
+    expect(t.accommodation).toEqual({ type: 'guesthouse', name: 'Riverside' })
+    expect(t.checklist).toEqual(['visa'])
   })
 
   it('a truncated link is reported as invalid rather than half-loaded', async () => {

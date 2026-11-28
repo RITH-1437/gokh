@@ -2,7 +2,7 @@
 
 GoKH is a **client-only Vue 3 trip planner for Cambodia**. There is no backend,
 database, auth or server state. All trip data lives in the browser and is shared
-through a `#e.<payload>` share link (legacy `?trip=` links still open).
+through a `#f.<payload>` share link (older `#e.` and `?trip=` links still open).
 
 Use this file as the operating guide. Read the linked docs in `docs/` before
 large changes.
@@ -51,7 +51,9 @@ npm run preview      # serve dist/ with production security headers
 | `src/composables/useToasts.ts` | Global toast queue |
 | `src/utils/tripSchema.ts` | `sanitizeTrip()` — **trust boundary** for all trip data |
 | `src/utils/encoding.ts` | Trip ↔ share links (versioned; packed, compressed, encrypted) |
-| `src/utils/tripPack.ts` | Compact positional trip form used inside v2 links |
+| `src/utils/tripBinary.ts` | Compact binary trip form inside v3 links |
+| `src/utils/shareDictionary.ts` | Frozen, append-only catalog phrase table for v3 links |
+| `src/utils/tripPack.ts` | v2 link decoder (decode only) |
 | `src/utils/storage.ts` | localStorage draft (`gokh:trip:v1`) |
 | `src/utils/dates.ts` | Local-time ISO helpers, `MAX_TRIP_DAYS` |
 | `src/utils/currency.ts` | USD/KHR (1 USD = 4,000 KHR), parsing, formatting |
@@ -63,16 +65,18 @@ See `docs/SECURITY.md` for the threat model and CSP rules.
 
 ## Invariants — do not break
 
-- **All incoming trip data is untrusted.** Anything read from a share link (`#e.…`, `?trip=`) or
+- **All incoming trip data is untrusted.** Anything read from a share link (`#f.…`, `#e.…`, `?trip=`) or
   `localStorage` must go through `sanitizeTrip` (`tripSchema.ts`). It whitelists
   enums, caps string lengths, validates real `YYYY-MM-DD` dates, caps ranges at
   90 days (`MAX_TRIP_DAYS`), limits ≤50 travelers and ≤50 activities/day, and
   forces non-negative finite amounts.
 - **Old share links must keep working.** Current links are
-  `/#e.<base64url(key ‖ AES-GCM(deflate(packTrip(trip))))>`; v1 `?trip=z.…` and
-  v0 `?trip=<base64url JSON>` are decode-only and must never be removed. A new
-  format needs a new prefix plus a backward-compat test. Limits: 200 KB encoded,
-  4 MB inflated. See `docs/ARCHITECTURE.md` → Share-link format.
+  `/#f.<base64url(key ‖ AES-GCM(binary trip))>`; v2 `#e.…`, v1 `?trip=z.…` and
+  v0 `?trip=<base64url JSON>` are decode-only and must never be removed.
+  `SHARE_DICTIONARY`, `SHARE_CHECKLIST` and the enum lists in `tripBinary.ts` are
+  **append-only** (old links store indices). A new format needs a new prefix plus
+  a backward-compat test. Limits: 200 KB encoded, 4 MB inflated. See
+  `docs/ARCHITECTURE.md` → Share-link format.
 - **Domain rules live in `useTrip`**: first traveler is the leader, exactly one
   leader, removing a traveler removes their contribution, itinerary days follow
   the date range, an invalid or >90-day range leaves the itinerary untouched,
@@ -89,8 +93,8 @@ See `docs/SECURITY.md` for the threat model and CSP rules.
 
 | Task | Files |
 | --- | --- |
-| Add/change a destination or photo | `src/data/destinations.ts`, image under `src/assets/images/place/` |
-| Change suggested activities | `src/data/activities.ts` (only the first 6 show) |
+| Add/change a destination or photo | `src/data/destinations.ts`, image under `src/assets/images/place/`; append new names to `src/utils/shareDictionary.ts` |
+| Change suggested activities | `src/data/activities.ts` (only the first 6 show); append new phrases to `src/utils/shareDictionary.ts` |
 | Add a new planner field | `src/types/trip.ts` → `sanitizeTrip` → `useTrip` → relevant component(s) → tests |
 | Change share/persistence behaviour | `encoding.ts` / `storage.ts` + `useTrip` + matching `*.test.ts` |
 | Add an external service | add origin to CSP in `vercel.json` (see `docs/SECURITY.md`) |
